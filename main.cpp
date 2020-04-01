@@ -20,17 +20,17 @@ public:
 
 	bool Update(float DeltaTime) override
 	{
-		for(int y = 0; y < ScreenHeight(); y++) {
-			for(int x = 0; x < ScreenWidth(); x++) {
+		for(int y = 0; y < ScreenHeight(); y+=2) {
+			for(int x = 0; x < ScreenWidth(); x+=2) {
 				std::string a;
 				for(int i = 0; i < TextLimit(); i++)
 				{
-					std::string b(1,(char)(rand() % 31 - (128 - 31)));
+					std::string b(1,rand() % '!'+'~'-'!');
 					a += b;
 				}
 				Draw(x,y,stoc(a));
 			}
-    		}
+    	}
 		DrawScreen(); // Must be used to draw screen
 		return true;
 	}
