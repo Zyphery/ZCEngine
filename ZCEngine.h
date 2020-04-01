@@ -1,10 +1,7 @@
 #include <iostream>
 #include <vector>
 #include <chrono>
-#include <cmath>
 #include <thread> 
-#include <stdio.h>
-#include <algorithm>
 
 /*
 
