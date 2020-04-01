@@ -86,9 +86,9 @@ namespace ZCPP { // Engine namespace
 
 enum Align
 	{
-		Left = -1,
-		Middle = 0,
-		Right = 1,
+		Left	= -1,
+		Middle	= 0,
+		Right	= 1,
 	};
 
 class ZCEngine
@@ -609,6 +609,8 @@ class ZCEngine
 			}
 		
 		if(align == Middle) // Alignes from the middle of the text at the position
+		{
+			float p = wrap/2;
 			for(int i = 0; i < size; i+=txtlmt)
 			{
 				std::string base;
@@ -616,10 +618,12 @@ class ZCEngine
 				{
 					base += text[i+ii];
 				}
-				Draw(x+(i/txtlmt),y,stoc(base));
+				Draw(x+(i/txtlmt)-p,y,stoc(base));
 			}
+		}
 
 		if(align == Right) // Alignes from the right side of the text at position
+		{
 			for(int i = 0; i < size; i+=txtlmt)
 			{
 				std::string base;
@@ -627,8 +631,9 @@ class ZCEngine
 				{
 					base += text[i+ii];
 				}
-				Draw(x+(i/txtlmt),y,stoc(base));
+				Draw(x+(i/txtlmt)-wrap-1,y,stoc(base));
 			}
+		}
 	
 	}
 
@@ -672,7 +677,7 @@ class ZCEngine
 				{
 					base += text[i+ii];
 				}
-				Draw(x+(i/txtlmt)-size/(i/txtlmt),y,stoc(base));
+				Draw(x+(i/txtlmt)-wrap,y,stoc(base));
 			}
 	}
 } // End of ZCEngine definition
