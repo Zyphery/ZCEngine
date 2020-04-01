@@ -20,8 +20,8 @@ public:
 
 	bool Update(float DeltaTime) override
 	{
-		for(int y = 0; y < ScreenHeight(); y+=2) {
-			for(int x = 0; x < ScreenWidth(); x+=2) {
+		for(int y = 0; y < ScreenHeight(); y++) {
+			for(int x = 0; x < ScreenWidth(); x++) {
 				std::string a;
 				for(int i = 0; i < TextLimit(); i++)
 				{
