@@ -30,7 +30,7 @@ public:
 				}
 				Draw(x,y,stoc(a));
 			}
-    }
+    		}
 		DrawScreen(); // Must be used to draw screen
 		return true;
 	}
