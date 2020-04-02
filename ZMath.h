@@ -1,5 +1,16 @@
 #include <cmath>
 
+// This math  library has no effect  on the main  ZCEngine  file.
+// This  is a separate  library  that can be used  along side the
+// base  engine.  The  library  holds 2D,  3D,  and  4D  classes.
+// They all  have overloaded  operators to do  basic and  special
+// math  functions  such  as  adding,  subtracting,  multiplying,
+// dividing,  and  normalizing.  The  add and subtract  functions
+// only work on  2 vectors.  The multiply  and divide  can use  a
+// vector or float.  The normalize  function is  called by  using
+// ~A;  A  as the  vector type.  Normalize is a void  and doesn't
+// return anything. More detail can be found inside the namespace
+
 namespace ZCPP
 {
 	class Vector2D // Vector2D class
