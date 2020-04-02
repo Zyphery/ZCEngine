@@ -5,10 +5,10 @@
 
 /*
 
-This is the header file of Zyphery's Console Engine
+This is the header file of  Zyphery's Console Engine
 In here is the namespace ZCPP which defines the draw
 and math functions. This comment will define them to
-make them easier to understand. I will also explain
+make them easier to understand. I will also  explain
 how to use this header file. In your main .cpp file:
 
 #include "ZCEngine.h"
@@ -49,30 +49,30 @@ int main()
 		Main.Initiate();
 }
 
-In the update override function, the float DeltaTime is used
-to make time smoother, it is the time in between each frame if
-you set a variable to add DeltaTime each frame, the variable
+In the update  override function,  the float DeltaTime  is used
+to make time smoother, it is the  time in between each frame if
+you set a  variable to add  DeltaTime each frame, the  variable
 will be +1 each realtime second
 
-inside int main() we create a variable of data type of our
-class that we define earlier called Example. If we build it
-with width 30 by height 20, and size 2, and it is possible, we
+inside  int main()  we create a  variable of  data type  of our
+class that  we define  earlier called  Example. If we  build it
+with width 30 by height 20,  and size 2, and it is possible, we
 will Initiate it. Then the program will run.
 
-The Start() function will run once at start of the program, if
-we override it, our code inside of it will run. Same with the
-other functions. Update() if overriden will run continuously
+The Start() function will run  once at start of the program, if
+we override  it, our code inside of it will run.  Same with the
+other functions.  Update() if  overriden will run  continuously
 after the Start function until false is returned. The destroy()
 function will run once Update() finishes.
 
 The function DrawScreen() draws everything that is drawn to the
 screen using the other Draw functions. Draw() draws at a single
 point. DrawLine() draws a line from x, y, to x1, y1. DrawRect()
-draws a rectangle at x, y, with a width of w, and height of h.
+draws a rectangle at x, y,  with a width of w, and height of h.
 DrawTriangle() draws a triangle at x1, y1 to x2, y2, to x3, y3.
-DrawCircle() draws a circle at x, y with a radius. The fill
-functions are the same thing and fill the inside of all the
-shapes. DrawString() will draw a string of text at x, y
+DrawCircle()  draws a  circle at x, y  with a radius.  The fill
+functions  are the  same thing and  fill the inside of all  the
+shapes.  DrawString()  will  draw  a  string  of  text at  x, y
 following with its alignment type.
 
 */
@@ -87,6 +87,24 @@ enum Align
 		Middle	= 0,
 		Right	= 1,
 	};
+
+// class ZCSprite
+// {
+// public:
+// 	ZCSprite();
+// 	ZCSprite(std::string file);
+
+// public:
+// 	bool LoadFile(std::string file);
+
+// public:
+// 	int32_t width = 0;
+// 	int32_t height = 0;
+// 	enum Mode { Outline, Fill };
+
+// public:
+// 	std::string Sample(float x, float y);
+// };
 
 class ZCEngine
 {
@@ -109,6 +127,11 @@ class ZCEngine
 		u_int8_t ScreenHeight();
 		u_int8_t TextLimit();
 
+		// Random Functions
+		float Noise(int32_t seed, int32_t x);
+		float Gaussian(int32_t dimension, int32_t seed, int32_t x);
+		float Perlin(int32_t seed, int32_t x, int32_t y);
+
 		// Conversion functions
 		std::string ctos(const char* c) { std::string s(c); return s;} // const char* to std::string
 		const char* stoc(std::string s) { return s.data(); } // std::string to const char*
@@ -126,6 +149,7 @@ class ZCEngine
 		void FillRect(int32_t x, int32_t y, int32_t w, int32_t h, const char* text);
 		void FillTriangle(int32_t x1, int32_t y1, int32_t x2, int32_t y2, int32_t x3, int32_t y3, const char* text);
 		void FillCircle(int32_t x, int32_t y, int32_t radius, const char* text);
+		//void DrawSprite(int32_t x, int32_t y, ZCSprite* sprite, uint32_t scale = 1);
 		void DrawString(int32_t x, int32_t y, const char* text, Align align);
 		void DrawString(int32_t x, int32_t y, std::string text, Align align);
 
@@ -164,10 +188,10 @@ class ZCEngine
 
 	bool ZCPP::ZCEngine::Initiate()
 	{
-		std::string ib;
-		for(int ia = 0; ia < TextLimit(); ia++)
-			ib+=" ";
-		screen.resize(ScreenWidth()*ScreenHeight(), ib);
+		std::string Basetxt;
+		for(int i = 0; i < TextLimit(); i++)
+			Basetxt+=" ";
+		screen.resize(ScreenWidth()*ScreenHeight(), Basetxt);
 		
 
 		printf("\033[?25l");
@@ -226,6 +250,7 @@ class ZCEngine
 
 		// Makes sure text fits the size limit of text
 		std::string textStr = text;
+
 		if(text!=NULL)
 		{
 			int strlen = textStr.length();
@@ -682,4 +707,27 @@ class ZCEngine
 			}
 		}
 	}
+
+	float ZCEngine::Noise(int32_t seed, int32_t x)
+	{
+		// Noise is  generated  randomly  with no  seed given
+		// the  value  returned  is a float  between 0 and 1.
+
+		return (sin( seed+x*sin(x+seed)-sin(seed) )+1)/2;
+	}
+
+	float ZCEngine::Gaussian(int32_t dimension, int32_t seed, int32_t x)
+	{
+		return 0;
+	}
+
+	float ZCEngine::Perlin(int32_t seed, int32_t x, int32_t y)
+	{
+		// Like noise, but generates  the same thing with the
+		// same seed. Perlin smooths out the randomness noise
+		// generates. Still random, nonetheless.
+
+		return 0;
+	}
+
 } // End of ZCEngine definition
