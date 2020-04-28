@@ -2,6 +2,7 @@
 #include <iostream>
 #include <cmath>
 
+
 // This math  library has no effect  on the main  ZCEngine  file.
 // This  is a separate  library  that can be used  along side the
 // base  engine.  The  library  holds 2D,  3D,  and  4D  classes.
@@ -13,6 +14,8 @@
 
 namespace ZCPP
 {
+	double const Pi = 3.14159265359;
+
 	// Vector classes:
 
 	class Vector2D // Vector2D class
@@ -25,6 +28,7 @@ namespace ZCPP
 		Vector2D(float _x, float _y) { x = _x; y = _y; }
 
 		static float Length(Vector2D A) { return sqrt(A.x * A.x + A.y * A.y); }
+		float Length() { return Length(Vector2D(this->x,this->y)); }
 		static float Distance(Vector2D A, Vector2D B) { return sqrt(pow(B.x - A.x, 2) + pow(B.y - A.y, 2)); }
 		static Vector2D Normalize(Vector2D A) { float L = Length(A); return Vector2D(A.x / L, A.y / L); }
 
@@ -87,6 +91,8 @@ namespace ZCPP
 	// absolute value of Vector2D A
 
 	float DP2D(Vector2D A, Vector2D B) { Vector2D C = A * B; return C.x + C.y; }
+	float fCP2D(Vector2D A, Vector2D B) { return (A.x * B.y) - (A.y * B.x); }
+	Vector2D vCP2D(Vector2D A) { return Vector2D(A.y, -A.x); }
 
 
 
@@ -100,6 +106,7 @@ namespace ZCPP
 		Vector3D(float _x, float _y, float _z) { x = _x; y = _y; z = _z; }
 
 		static float Length(Vector3D A) { return sqrt(A.x * A.x + A.y * A.y + A.z * A.z); }
+		float Length() { return Length(Vector3D(this->x, this->y, this->z)); }
 		static float Distance(Vector3D A, Vector3D B) { return sqrt(pow(B.x - A.x, 2) + pow(B.y - A.y, 2) + pow(B.z - A.z, 2)); }
 		static Vector3D Normalize(Vector3D A) { float L = Length(A); return Vector3D(A.x / L, A.y / L, A.z / L); }
 
@@ -179,6 +186,7 @@ namespace ZCPP
 		Quaternion(float _w, float _x, float _y, float _z) { w = _w; x = _x; y = _y; z = _z; }
 
 		static float Length(Quaternion A) { return sqrt(A.w * A.w + A.x * A.x + A.y * A.y + A.z * A.z); }
+		float Length() { return Length(Quaternion(this->w, this->x, this->y, this->z)); }
 		static float Distance(Quaternion A, Quaternion B) { return sqrt(pow(B.w - A.w, 2) + pow(B.x - A.x, 2) + pow(B.y - A.y, 2) + pow(B.z - A.z, 2)); }
 		static Quaternion Normalize(Quaternion A) { float L = Length(A); return Quaternion(A.w / L, A.x / L, A.y / L, A.z / L); }
 
