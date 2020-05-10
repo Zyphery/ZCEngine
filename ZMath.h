@@ -39,6 +39,12 @@ namespace ZCPP
 		static Vector2D Abs(Vector2D A) { return Vector2D(abs(A.x), abs(A.y)); }
 		void Abs() { Vector2D V = Abs(Vector2D(this->x, this->y)); this->x = V.x; this->y = V.y; }
 
+		static Vector2D Rotate(Vector2D A, float r) { Vector2D V; 
+		V.x = A.x * cos(r) - A.y * sin(r);
+		V.y = sin(r) * A.x + cos(r) * A.y; 
+		return V; }
+		void Rotate(float r) { Vector2D V = Rotate(Vector2D(this->x, this->y), r); this->x = V.x; this->y = V.y; }
+
 		static std::string ToString(Vector2D A) { return "<" + std::to_string(A.x) + ", " + std::to_string(A.y) + ">"; }
 		std::string ToString() { return "< " + std::to_string(this->x) + ", " + std::to_string(this->y) + " >"; }
 
@@ -235,10 +241,11 @@ namespace ZCPP
 
 	Vector3D QuaternionRotate(float r, Vector3D V, Vector3D A)
 	{
-		Quaternion RQ = RotationQuaternion(r, A);		// Rotation Quaternion
+		Quaternion RQ = RotationQuaternion(r, A);		// Rotation  Quaternion
 		Quaternion CQ = -RQ;							// Conjugate Quaternion
 		Quaternion VQ = Quaternion(0, V.x, V.y, V.z);	// Vector to Quaternion
 		RQ = RQ * VQ * CQ;	// Rotation Quaternion * Vector (quaternion form) * Conjugate of Rotation Quaternion
+		RQ = ~RQ;
 		return Vector3D(RQ.x, RQ.y, RQ.z);
 
 	}
