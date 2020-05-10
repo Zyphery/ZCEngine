@@ -2,6 +2,7 @@
 #include <iostream>
 #include <string>
 #include <cmath>
+#include <ctime>
 
 
 // This math  library has no effect  on the main  ZCEngine  file.
@@ -15,7 +16,7 @@
 
 namespace ZCPP
 {
-	const double Pi = 3.14159265359;
+	const long double Pi = 3.1415926535897932;
 
 	const float DegtoRad = Pi * 2. / 360.;
 	const float RadtoDeg = 1. / DegtoRad;
@@ -38,31 +39,15 @@ namespace ZCPP
 		void Normalize() { Vector2D V = { this->x, this->y}; Vector2D VN = Normalize(V); this->x = VN.x; this->y = VN.y; }
 		static Vector2D Abs(Vector2D A) { return Vector2D(abs(A.x), abs(A.y)); }
 		void Abs() { Vector2D V = Abs(Vector2D(this->x, this->y)); this->x = V.x; this->y = V.y; }
-
-		static Vector2D Rotate(Vector2D A, float r) { Vector2D V; 
-		V.x = A.x * cos(r) - A.y * sin(r);
-		V.y = sin(r) * A.x + cos(r) * A.y; 
-		return V; }
+		static Vector2D Rotate(Vector2D A, float r) { Vector2D V; V.x = A.x * cos(r) - A.y * sin(r); V.y = sin(r) * A.x + cos(r) * A.y; return V; }
 		void Rotate(float r) { Vector2D V = Rotate(Vector2D(this->x, this->y), r); this->x = V.x; this->y = V.y; }
+		static Vector2D Random() { srand(time(0)-rand()%10000-5000);  return Normalize(Vector2D(rand() % 10000 - 5000, rand() % 10000 - 5000)); }
 
 		static std::string ToString(Vector2D A) { return "<" + std::to_string(A.x) + ", " + std::to_string(A.y) + ">"; }
 		std::string ToString() { return "< " + std::to_string(this->x) + ", " + std::to_string(this->y) + " >"; }
 
-		static Vector2D Max(Vector2D A, Vector2D B)
-		{
-			Vector2D C;
-			C.x = std::fmax(A.x, B.x);
-			C.y = std::fmax(A.y, B.y);
-			return C;
-		}
-
-		static Vector2D Min(Vector2D A, Vector2D B)
-		{
-			Vector2D C;
-			C.x = std::fmin(A.x, B.x);
-			C.y = std::fmin(A.y, B.y);
-			return C;
-		}
+		static Vector2D Max(Vector2D A, Vector2D B) { Vector2D C; C.x = std::fmax(A.x, B.x); C.y = std::fmax(A.y, B.y); return C; }
+		static Vector2D Min(Vector2D A, Vector2D B) { Vector2D C; C.x = std::fmin(A.x, B.x); C.y = std::fmin(A.y, B.y); return C; }
 	};
 
 	bool operator == (const Vector2D& A, const Vector2D& B) { return (A.x == B.x && A.y == B.y); }
@@ -125,27 +110,13 @@ namespace ZCPP
 		void Normalize() { Vector3D V = { this->x, this->y, this->z }; Vector3D VN = Normalize(V); this->x = VN.x; this->y = VN.y; this->z = VN.z; }
 		static Vector3D Abs(Vector3D A) { return Vector3D(abs(A.x), abs(A.y), abs(A.z)); }
 		void Abs() { Vector3D V = Abs(Vector3D(this->x, this->y, this->z)); this->x = V.x; this->y = V.y; this->z = V.z; }
+		static Vector3D Random() { srand(time(0) - rand() % 10000 - 5000);  return Normalize(Vector3D(rand() % 10000 - 5000, rand() % 10000 - 5000, rand() % 10000 - 5000)); }
 
 		static std::string ToString(Vector3D A) { return "<" + std::to_string(A.x) + ", " + std::to_string(A.y) + ", " + std::to_string(A.z) + ">"; }
 		std::string ToString() { return "< " + std::to_string(this->x) + ", " + std::to_string(this->y) + ", " + std::to_string(this->z) + " >"; }
 
-		static Vector3D Max(Vector3D A, Vector3D B)
-		{
-			Vector3D C;
-			C.x = std::fmax(A.x, B.x);
-			C.y = std::fmax(A.y, B.y);
-			C.z = std::fmax(A.z, B.z);
-			return C;
-		}
-
-		static Vector3D Min(Vector3D A, Vector3D B)
-		{
-			Vector3D C;
-			C.x = std::fmin(A.x, B.x);
-			C.y = std::fmin(A.y, B.y);
-			C.z = std::fmin(A.z, B.z);
-			return C;
-		}
+		static Vector3D Max(Vector3D A, Vector3D B) { Vector3D C; C.x = std::fmax(A.x, B.x); C.y = std::fmax(A.y, B.y); C.z = std::fmax(A.z, B.z); return C; }
+		static Vector3D Min(Vector3D A, Vector3D B) { Vector3D C; C.x = std::fmin(A.x, B.x); C.y = std::fmin(A.y, B.y); C.z = std::fmin(A.z, B.z); return C; }
 	};
 
 	bool operator == (const Vector3D& A, const Vector3D& B) { return (A.x == B.x && A.y == B.y && A.z == B.z); }
