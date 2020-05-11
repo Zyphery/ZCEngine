@@ -14,7 +14,7 @@
 // vector or float. More detail can be found inside the namespace
 
 std::random_device device; std::mt19937 rng(device());
-std::uniform_int_distribution<int32_t> rnd(-2147483648, 2147483648);
+std::uniform_int_distribution<int32_t> rnd(-2147483647, 2147483647);
 
 namespace ZCPP
 {
