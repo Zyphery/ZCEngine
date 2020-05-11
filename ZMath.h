@@ -23,6 +23,12 @@ namespace ZCPP
 	const float DegtoRad = Pi * 2. / 360.;
 	const float RadtoDeg = 1. / DegtoRad;
 
+	int64_t Random() { return rnd(rng); }
+
+	int64_t Random(int64_t min, int64_t max) 
+	{ if (max < min) std::swap(min, max); if (min == max) return max;
+	std::uniform_int_distribution<int64_t> rnd(min, max); return rnd(rng); }
+
 	// Vector classes:
 
 	class Vector2D // Vector2D class
