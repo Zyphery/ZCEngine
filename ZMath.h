@@ -14,7 +14,7 @@
 // vector or float. More detail can be found inside the namespace
 
 std::random_device device; std::mt19937 rng(device());
-std::uniform_int_distribution<int64_t> rnd(-9223372036854775807, 9223372036854775807);
+std::uniform_int_distribution<int32_t> rnd(-2147483648, 2147483648);
 
 namespace ZCPP
 {
@@ -23,11 +23,11 @@ namespace ZCPP
 	const float DegtoRad = Pi * 2. / 360.;
 	const float RadtoDeg = 1. / DegtoRad;
 
-	int64_t Random() { return rnd(rng); }
+	int32_t Random() { return rnd(rng); }
 
-	int64_t Random(int64_t min, int64_t max) 
+	int32_t Random(int32_t min, int32_t max) 
 	{ if (max < min) std::swap(min, max); if (min == max) return max;
-	std::uniform_int_distribution<int64_t> rnd(min, max); return rnd(rng); }
+	std::uniform_int_distribution<int32_t> rnd(min, max); return rnd(rng); }
 
 	// Vector classes:
 
