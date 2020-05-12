@@ -92,12 +92,22 @@ namespace ZCPP
 	};
 
 	/* Comparison Operators */
+
 	bool operator == (const Vector2D& A, const Vector2D& B) { return (A.x == B.x && A.y == B.y); }
-	bool operator < (const Vector2D& A, const Vector2D& B) { return (A.x < B.x && A.y < B.y); }
-	bool operator > (const Vector2D& A, const Vector2D& B) { return (A.x > B.x && A.y > B.y); }
+	bool operator <  (const Vector2D& A, const Vector2D& B) { return (A.x <  B.x && A.y <  B.y); }
+	bool operator >  (const Vector2D& A, const Vector2D& B) { return (A.x >  B.x && A.y >  B.y); }
 	bool operator <= (const Vector2D& A, const Vector2D& B) { return (A.x <= B.x && A.y <= B.y); }
 	bool operator >= (const Vector2D& A, const Vector2D& B) { return (A.x >= B.x && A.y >= B.y); }
 	bool operator != (const Vector2D& A, const Vector2D& B) { return (A.x != B.x && A.y != B.y); }
+
+	// Comparing A Vector3D to a float is like comparing a Vector3D to a Vector3D with all the same values
+
+	bool operator == (const Vector2D& A, const float& B) { return (A.x == B && A.y == B); }
+	bool operator <  (const Vector2D& A, const float& B) { return (A.x <  B && A.y <  B); }
+	bool operator >  (const Vector2D& A, const float& B) { return (A.x >  B && A.y >  B); }
+	bool operator <= (const Vector2D& A, const float& B) { return (A.x <= B && A.y <= B); }
+	bool operator >= (const Vector2D& A, const float& B) { return (A.x >= B && A.y >= B); }
+	bool operator != (const Vector2D& A, const float& B) { return (A.x != B && A.y != B); }
 
 	// Add a Vector2D to a Vector2D
 	Vector2D operator + (const Vector2D& A, const Vector2D& B) { return Vector2D(A.x + B.x, A.y + B.y); }
@@ -171,12 +181,22 @@ namespace ZCPP
 	};
 
 	/* Comparison Operators */
+
 	bool operator == (const Vector3D& A, const Vector3D& B) { return (A.x == B.x && A.y == B.y && A.z == B.z); }
-	bool operator < (const Vector3D& A, const Vector3D& B) { return (A.x < B.x && A.y < B.y && A.z < B.z); }
-	bool operator > (const Vector3D& A, const Vector3D& B) { return (A.x > B.x && A.y > B.y && A.z > B.z); }
+	bool operator <  (const Vector3D& A, const Vector3D& B) { return (A.x <  B.x && A.y <  B.y && A.z <  B.z); }
+	bool operator >  (const Vector3D& A, const Vector3D& B) { return (A.x >  B.x && A.y >  B.y && A.z >  B.z); }
 	bool operator <= (const Vector3D& A, const Vector3D& B) { return (A.x <= B.x && A.y <= B.y && A.x <= B.x); }
 	bool operator >= (const Vector3D& A, const Vector3D& B) { return (A.x >= B.x && A.y >= B.y && A.x >= B.x); }
 	bool operator != (const Vector3D& A, const Vector3D& B) { return (A.x != B.x && A.y != B.y && A.x != B.x); }
+
+	// Comparing A Vector3D to a float is like comparing a Vector3D to a Vector3D with all the same values
+
+	bool operator == (const Vector3D& A, const float& B) { return (A.x == B && A.y == B && A.z == B); }
+	bool operator <  (const Vector3D& A, const float& B) { return (A.x <  B && A.y <  B && A.z <  B); }
+	bool operator >  (const Vector3D& A, const float& B) { return (A.x >  B && A.y >  B && A.z >  B); }
+	bool operator <= (const Vector3D& A, const float& B) { return (A.x <= B && A.y <= B && A.x <= B); }
+	bool operator >= (const Vector3D& A, const float& B) { return (A.x >= B && A.y >= B && A.x >= B); }
+	bool operator != (const Vector3D& A, const float& B) { return (A.x != B && A.y != B && A.x != B); }
 
 	// Add a Vector3D to a Vector3D
 	Vector3D operator + (const Vector3D& A, const Vector3D& B) { return Vector3D(A.x + B.x, A.y + B.y, A.z + B.z); }
