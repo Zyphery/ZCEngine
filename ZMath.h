@@ -18,20 +18,49 @@ std::uniform_int_distribution<int32_t> rnd(-2147483647, 2147483647);
 
 namespace ZCPP
 {
+	// The constant 𝜋
 	const long double Pi = 3.1415926535897932;
 
+	// Converting Degress to Radians
 	const float DegtoRad = Pi * 2. / 360.;
+	// Converting Radians to Degrees
 	const float RadtoDeg = 1. / DegtoRad;
 
+	/* Int32 Random ( -2147483647, 2147483647 ) */
+	// Returns a random number between -2147483647, 2147483647 in int form
 	int32_t Random() { return rnd(rng); }
+	// Returns a random number between the min and max in int form
+	int32_t Random(int32_t min, int32_t max)
+	{if (max < min) std::swap(min, max); if (min == max) return max;
+	std::uniform_int_distribution<int32_t> nrnd(min, max); return nrnd(rng);}
 
-	int32_t Random(int32_t min, int32_t max) 
-	{ if (max < min) std::swap(min, max); if (min == max) return max;
-	std::uniform_int_distribution<int32_t> rnd(min, max); return rnd(rng); }
+	/* Float Random ( -1, 1 ) */
+	// 25 decimal point precision
+	// Returns a random number between -1 and 1 in float form
+	float Randomf() { std::uniform_real_distribution<float> nrnd(-1, 1); return nrnd(rng); }
+	// Returns a random number between the min and max in float form
+	float Randomf(float min, float max) { if (max < min) std::swap(min, max); if (min == max) return max; 
+	std::uniform_real_distribution<float> nrnd(min, max); return nrnd(rng); }
+
+	/* Double Random ( -1, 1 ) */
+	// 50 decimal point precision
+	// Returns a random number between -1 and 1 in double form
+	double Randomd() { std::uniform_real_distribution<double> nrnd(-1, 1); return nrnd(rng); }
+	// Returns a random number between the min and max in double form
+	double Randomd(double min, double max) { if (max < min) std::swap(min, max); if (min == max) return max;
+	std::uniform_real_distribution<double> nrnd(min, max); return nrnd(rng);}
+
+	// Get percentage of where value is between min and max
+	float PercentagefromValue(float min, float max, float value) { return (value - min) / (max - min); }
+	// Get value from percentage between min and max
+	float PercentagetoValue(float min, float max, float percentage) { return max*percentage+min; }
+
+	// Clamps any type of Value between min and max
+	template <typename Type> Type Clamp(Type min, Type max, Type Value) { if (max < min) std::swap(min, max); if (Value < min) return min; else if (Value > max) return max; else return Value; }
 
 	// Vector classes:
 
-	class Vector2D // Vector2D class
+	class Vector2D // Vector2D class ( X, Y )
 	{
 	public:
 		float x, y;
@@ -51,13 +80,18 @@ namespace ZCPP
 		void Rotate(float r) { Vector2D V = Rotate(Vector2D(this->x, this->y), r); this->x = V.x; this->y = V.y; }
 		static Vector2D Random() { return Normalize(Vector2D(rnd(rng), rnd(rng))); }
 
+		// Converts A Vector2D into a std::string
 		static std::string ToString(Vector2D A) { return "<" + std::to_string(A.x) + ", " + std::to_string(A.y) + ">"; }
+		// Converts this Vector2D into a std::string
 		std::string ToString() { return "< " + std::to_string(this->x) + ", " + std::to_string(this->y) + " >"; }
 
+		// Returns the Max of both x's and both y's
 		static Vector2D Max(Vector2D A, Vector2D B) { Vector2D C; C.x = std::fmax(A.x, B.x); C.y = std::fmax(A.y, B.y); return C; }
+		// Returns the Min of both x's and both y's
 		static Vector2D Min(Vector2D A, Vector2D B) { Vector2D C; C.x = std::fmin(A.x, B.x); C.y = std::fmin(A.y, B.y); return C; }
 	};
 
+	/* Comparison Operators */
 	bool operator == (const Vector2D& A, const Vector2D& B) { return (A.x == B.x && A.y == B.y); }
 	bool operator < (const Vector2D& A, const Vector2D& B) { return (A.x < B.x && A.y < B.y); }
 	bool operator > (const Vector2D& A, const Vector2D& B) { return (A.x > B.x && A.y > B.y); }
@@ -65,44 +99,49 @@ namespace ZCPP
 	bool operator >= (const Vector2D& A, const Vector2D& B) { return (A.x >= B.x && A.y >= B.y); }
 	bool operator != (const Vector2D& A, const Vector2D& B) { return (A.x != B.x && A.y != B.y); }
 
-	Vector2D operator + (const Vector2D& A, const Vector2D& B) { return Vector2D(A.x + B.x, A.y + B.y); }
 	// Add a Vector2D to a Vector2D
+	Vector2D operator + (const Vector2D& A, const Vector2D& B) { return Vector2D(A.x + B.x, A.y + B.y); }
 
-	Vector2D operator - (const Vector2D& A, const Vector2D& B) { return Vector2D(A.x - B.x, A.y - B.y); }
 	// Subtract a Vector2D by a Vector2D
+	Vector2D operator - (const Vector2D& A, const Vector2D& B) { return Vector2D(A.x - B.x, A.y - B.y); }
 
+	// Multiply a Vector2D by a Vector2D in the form of Ax * Bx, Ay * By
 	Vector2D operator * (const Vector2D& A, const Vector2D& B) { return Vector2D(A.x * B.x, A.y * B.y); }
-	// Multiply a Vector2D by a Vector2D
 
-	Vector2D operator * (const Vector2D& A, const float& B) { return Vector2D(A.x * B, A.y * B); }
-	Vector2D operator * (const float& A, const Vector2D& B) { return(B * A); }
 	// Multiply a Vector2D by a float
+	Vector2D operator * (const Vector2D& A, const float& B) { return Vector2D(A.x * B, A.y * B); }
+	// Multiply a Vector2D by a float
+	Vector2D operator * (const float& A, const Vector2D& B) { return(B * A); }
 
+	// Divide a Vector2D by a Vector2D in the form of Ax / Bx, Ay / By
 	Vector2D operator / (const Vector2D& A, const Vector2D& B) { return Vector2D(A.x / B.x, A.y / B.y); }
-	// Divide a Vector2D by a Vector2D
 
-	Vector2D operator / (const Vector2D& A, const float& B) { return Vector2D(A.x / B, A.y / B); }
-	Vector2D operator / (const float& A, const Vector2D& B) { return (B / A); }
 	// Divide a Vector2D by a float
+	Vector2D operator / (const Vector2D& A, const float& B) { return Vector2D(A.x / B, A.y / B); }
+	// Divide a Vector2D by a float
+	Vector2D operator / (const float& A, const Vector2D& B) { return (B / A); }
 
 	Vector2D& operator += (Vector2D& A, const Vector2D& B) { A.x += B.x; A.y += B.y; return A; }
 	Vector2D& operator -= (Vector2D& A, const Vector2D& B) { A.x -= B.x; A.y -= B.y; return A; }
 	Vector2D& operator *= (Vector2D& A, const float& B) { A.x *= B; A.y *= B; return A; }
 	Vector2D& operator /= (Vector2D& A, const float& B) { A.x /= B; A.y /= B; return A; }
 
-	Vector2D operator ~ (Vector2D const& A) { return Vector2D::Normalize(A); }
-	// Normalizes Vector2D A
+	// Normalizes Vector2D A to a unit Vector
+	Vector2D operator ~ (Vector2D& A) { return Vector2D::Normalize(A); }
 
-	Vector2D operator ! (Vector2D& const A) { A.Abs();  return A; }
-	// absolute value of Vector2D A
+	// Absolute value of Vector2D A
+	Vector2D operator ! (Vector2D& A) { A.Abs();  return A; }
 
+	// Dot Product of Vector2D
 	float DP2D(Vector2D A, Vector2D B) { Vector2D C = A * B; return C.x + C.y; }
+	// Cross Product of Vector2D returning a float
 	float fCP2D(Vector2D A, Vector2D B) { return (A.x * B.y) - (A.y * B.x); }
+	// Cross Product of Vector2D returning a Vector2D
 	Vector2D vCP2D(Vector2D A) { return Vector2D(A.y, -A.x); }
 
 
 
-	class Vector3D // Vector3D class
+	class Vector3D // Vector3D class ( X, Y, Z )
 	{
 	public:
 		float x, y, z;
@@ -120,13 +159,18 @@ namespace ZCPP
 		void Abs() { Vector3D V = Abs(Vector3D(this->x, this->y, this->z)); this->x = V.x; this->y = V.y; this->z = V.z; }
 		static Vector3D Random() { return Normalize(Vector3D(rnd(rng), rnd(rng), rnd(rng))); }
 
+		// Converts A Vector2D into a std::string
 		static std::string ToString(Vector3D A) { return "<" + std::to_string(A.x) + ", " + std::to_string(A.y) + ", " + std::to_string(A.z) + ">"; }
+		// Converts this Vector2D into a std::string
 		std::string ToString() { return "< " + std::to_string(this->x) + ", " + std::to_string(this->y) + ", " + std::to_string(this->z) + " >"; }
 
+		// Returns the Max of both x's and both y's and both z's
 		static Vector3D Max(Vector3D A, Vector3D B) { Vector3D C; C.x = std::fmax(A.x, B.x); C.y = std::fmax(A.y, B.y); C.z = std::fmax(A.z, B.z); return C; }
+		// Returns the Min of both x's and both y's and both z's
 		static Vector3D Min(Vector3D A, Vector3D B) { Vector3D C; C.x = std::fmin(A.x, B.x); C.y = std::fmin(A.y, B.y); C.z = std::fmin(A.z, B.z); return C; }
 	};
 
+	/* Comparison Operators */
 	bool operator == (const Vector3D& A, const Vector3D& B) { return (A.x == B.x && A.y == B.y && A.z == B.z); }
 	bool operator < (const Vector3D& A, const Vector3D& B) { return (A.x < B.x && A.y < B.y && A.z < B.z); }
 	bool operator > (const Vector3D& A, const Vector3D& B) { return (A.x > B.x && A.y > B.y && A.z > B.z); }
@@ -134,44 +178,48 @@ namespace ZCPP
 	bool operator >= (const Vector3D& A, const Vector3D& B) { return (A.x >= B.x && A.y >= B.y && A.x >= B.x); }
 	bool operator != (const Vector3D& A, const Vector3D& B) { return (A.x != B.x && A.y != B.y && A.x != B.x); }
 
-	Vector3D operator + (const Vector3D& A, const Vector3D& B) { return Vector3D(A.x + B.x, A.y + B.y, A.z + B.z); }
 	// Add a Vector3D to a Vector3D
+	Vector3D operator + (const Vector3D& A, const Vector3D& B) { return Vector3D(A.x + B.x, A.y + B.y, A.z + B.z); }
 
-	Vector3D operator - (const Vector3D& A, const Vector3D& B) { return Vector3D(A.x - B.x, A.y - B.y, A.z - B.z); }
 	// Subtract a Vector3D by a Vector3D
+	Vector3D operator - (const Vector3D& A, const Vector3D& B) { return Vector3D(A.x - B.x, A.y - B.y, A.z - B.z); }
 
+	// Multiply a Vector3D by a Vector3D in the form of Ax * Bx, Ay * By, Az * Bz
 	Vector3D operator * (const Vector3D& A, const Vector3D& B) { return Vector3D(A.x * B.x, A.y * B.y, A.z * B.z); }
-	// Multiply a Vector3D by a Vector3D
 
-	Vector3D operator * (const Vector3D& A, const float& B) { return Vector3D(A.x * B, A.y * B, A.z * B); }
-	Vector3D operator * (const float& A, const Vector3D& B) { return(B * A); }
 	// Multiply a Vector3D by a float
+	Vector3D operator * (const Vector3D& A, const float& B) { return Vector3D(A.x * B, A.y * B, A.z * B); }
+	// Multiply a Vector3D by a float
+	Vector3D operator * (const float& A, const Vector3D& B) { return(B * A); }
 
+	// Divide a Vector3D by a Vector3D in the form of Ax / Bx, Ay / By, Az / Bz
 	Vector3D operator / (const Vector3D& A, const Vector3D& B) { return Vector3D(A.x / B.x, A.y / B.y, A.z / B.z); }
-	// Divide a Vector3D by a Vector3D
 
-	Vector3D operator / (const Vector3D& A, const float& B) { return Vector3D(A.x / B, A.y / B, A.z / B); }
-	Vector3D operator / (const float& A, const Vector3D& B) { return (B / A); }
 	// Divide a Vector3D by a float
+	Vector3D operator / (const Vector3D& A, const float& B) { return Vector3D(A.x / B, A.y / B, A.z / B); }
+	// Divide a Vector3D by a float
+	Vector3D operator / (const float& A, const Vector3D& B) { return (B / A); }
 
 	Vector3D& operator += (Vector3D& A, const Vector3D& B) { A.x += B.x; A.y += B.y; A.z += B.z; return A; }
 	Vector3D& operator -= (Vector3D& A, const Vector3D& B) { A.x -= B.x; A.y -= B.y; A.z += B.z; return A; }
 	Vector3D& operator *= (Vector3D& A, const float& B) { A.x *= B; A.y *= B; A.z *= B; return A; }
 	Vector3D& operator /= (Vector3D& A, const float& B) { A.x /= B; A.y /= B; A.z /= B; return A; }
 
+	// Normalizes Vector3D A to a unit Vector
 	Vector3D operator ~ (Vector3D& A) { return Vector3D::Normalize(A); }
-	// Normalizes Vector3D A
 
+	// Absolute value of Vector3D A
 	Vector3D operator ! (Vector3D& A) { A.Abs(); return A; }
-	// absolute value of Vector3D A
 	
+	// Dot Product of Vector3D
 	float DP3D(Vector3D A, Vector3D B) { Vector3D C = A * B; return C.x + C.y + C.z; }
+	// Cross Product of Vector3D returning a Vector3
 	Vector3D CP3D(Vector3D A, Vector3D B) { Vector3D C; C.x = A.y * B.z - A.z * B.y; C.y = A.z * B.x - A.x * B.z; C.z = A.x * B.y - A.y * B.x; return C; }
 
 
 
 	// Still figuring out Quaternions, use at your own risk
-	class Quaternion // Quaternion class
+	class Quaternion // Quaternion class ( W, X, Y, Z )
 	{
 	public:
 		float w, x, y, z;
@@ -192,6 +240,7 @@ namespace ZCPP
 		std::string ToString() { return "< " + std::to_string(this->w) + ", " + std::to_string(this->x) + ", " + std::to_string(this->y) + ", " + std::to_string(this->z) + " >"; }
 	};
 
+	/* Comparison Operators */
 	bool operator == (const Quaternion& A, const Quaternion& B) { return (A.w == B.w && A.x == B.x && A.y == B.y && A.z == B.z); }
 	bool operator < (const Quaternion& A, const Quaternion& B) { return (A.w < B.w && A.x < B.x && A.y < B.y && A.z < B.z); }
 	bool operator > (const Quaternion& A, const Quaternion& B) { return (A.w > B.w && A.x > B.x&& A.y > B.y&& A.z > B.z); }
@@ -199,14 +248,14 @@ namespace ZCPP
 	bool operator >= (const Quaternion& A, const Quaternion& B) { return (A.w >= B.w && A.x >= B.x && A.y >= B.y && A.x >= B.x); }
 	bool operator != (const Quaternion& A, const Quaternion& B) { return (A.w != B.w && A.x != B.x && A.y != B.y && A.x != B.x); }
 
+	// Normalizes Vector3D A as a unit Quaternion
 	Quaternion operator ~ (Quaternion& A) { return Quaternion::Normalize(A); }
-	// Normalizes Vector3D A
 	
-	Quaternion operator - (Quaternion& A) { Quaternion Q = Quaternion(-A.w, -A.x, -A.y, -A.z); Q = ~Q; return Q; }
 	// Turns the given Quaternion into its Conjugate
+	Quaternion operator - (Quaternion& A) { Quaternion Q = Quaternion(-A.w, -A.x, -A.y, -A.z); Q = ~Q; return Q; }
 
-	Quaternion operator * (Quaternion const& A, Quaternion const& B) { return Quaternion(A.x * B.w + A.y * B.z - A.z * B.y + A.w * B.x, -A.x * B.z + A.y * B.w + A.z * B.x + A.w * B.y, A.x * B.y - A.y * B.x + A.z * B.w + A.w * B.z, -A.x * B.x - A.y * B.y - A.z * B.z + A.w * B.w); }
 	// Multiplies a Quaternion by a Quaternion
+	Quaternion operator * (Quaternion const& A, Quaternion const& B) { return Quaternion(A.x * B.w + A.y * B.z - A.z * B.y + A.w * B.x, -A.x * B.z + A.y * B.w + A.z * B.x + A.w * B.y, A.x * B.y - A.y * B.x + A.z * B.w + A.w * B.z, -A.x * B.x - A.y * B.y - A.z * B.z + A.w * B.w); }
 
 	/* order of quaternion multiplication
 	A.w*B.w - A.x*B.x - A.y*B.y - A.z*B.z
@@ -215,9 +264,10 @@ namespace ZCPP
 	A.w*B.z + A.x*B.y - A.y*B.x + A.z*B.w
 	*/
 
-	Quaternion RotationQuaternion(float r, Vector3D A) { Quaternion q = Quaternion(r, A.x, A.y, A.z); ~q; return q; }
 	// Creates a rotation Quaternion using r (radians) and A (Vector3D Axis)
+	Quaternion RotationQuaternion(float r, Vector3D A) { Quaternion q = Quaternion(r, A.x, A.y, A.z); ~q; return q; }
 
+	// Rotates V (Vector3D) around A (axis) by r (radians) using a Rotation Quaternion created with r & A
 	Vector3D QuaternionRotate(float r, Vector3D V, Vector3D A)
 	{
 		Quaternion RQ = RotationQuaternion(r, A);		// Rotation  Quaternion
@@ -229,8 +279,7 @@ namespace ZCPP
 
 	}
 	//return 2 * DP3D(u, V) * u + (pow(q.w, 2) - DP3D(u, u)) * V + 2 * q.w * CP3D(u, V); }
-	// Rotates V (Vector3D) around A (axis) by r (radians) using a Rotation Quaternion created with r & A
 	
+	// Absolute value of Vector3D A
 	Quaternion operator ! (Quaternion& A) { A.Abs(); return A; }
-	// absolute value of Vector3D A
 };
