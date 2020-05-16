@@ -51,12 +51,15 @@ namespace ZCPP
 	std::uniform_real_distribution<double> nrnd(min, max); return nrnd(rng);}
 
 	// Get percentage of where value is between min and max
-	float PercentagefromValue(float min, float max, float value) { return (value - min) / (max - min); }
+	template <typename Type> Type PercentagefromValue(Type min, Type max, Type value) { return (value - min) / (max - min); }
 	// Get value from percentage between min and max
-	float PercentagetoValue(float min, float max, float percentage) { return max*percentage+min; }
+	template <typename Type> Type PercentagetoValue(Type min, Type max, Type percentage) { return max*percentage+min; }
 
 	// Clamps any type of Value between min and max
 	template <typename Type> Type Clamp(Type min, Type max, Type Value) { if (max < min) std::swap(min, max); if (Value < min) return min; else if (Value > max) return max; else return Value; }
+
+	// Maps values from in-min and in-max to out-min and out-max
+	template <typename Type> Type Map(Type inMin, Type inMax, Type outMin, Type outMax, Type Value){ return PercentagetoValue(outMin, outMax, PercentagefromValue(inMin, inMax, Value)); }
 
 	// Vector classes:
 
@@ -160,6 +163,9 @@ namespace ZCPP
 		Vector3D(float _) { x = _; y = _; z = _; }
 		Vector3D(float _x, float _y, float _z) { x = _x; y = _y; z = _z; }
 
+		/* Casting Vector3D to Vector2D */
+		operator Vector2D() const { return Vector2D(x, y); }
+
 		static float Length(Vector3D A) { return sqrt(A.x * A.x + A.y * A.y + A.z * A.z); }
 		float Length() { return Length(Vector3D(this->x, this->y, this->z)); }
 		static float Distance(Vector3D A, Vector3D B) { return sqrt(pow(B.x - A.x, 2) + pow(B.y - A.y, 2) + pow(B.z - A.z, 2)); }
@@ -247,6 +253,10 @@ namespace ZCPP
 		Quaternion() { w = 1; x = 0; y = 0; z = 0; }
 		Quaternion(float _) { w = _; x = _; y = _; z = _; }
 		Quaternion(float _w, float _x, float _y, float _z) { w = _w; x = _x; y = _y; z = _z; }
+
+		/* Casting Quaternion to Vector3D or Vector2D */
+		operator Vector2D() const { return Vector2D(x, y); }
+		operator Vector3D() const { return Vector3D(x, y, z); }
 
 		static float Length(Quaternion A) { return sqrt(A.w * A.w + A.x * A.x + A.y * A.y + A.z * A.z); }
 		float Length() { return Length(Quaternion(this->w, this->x, this->y, this->z)); }
