@@ -32,7 +32,6 @@ public:
 
 	bool Update(float DeltaTime) override
 	{
-		DrawScreen(); // Must be used to draw screen
 		return true;
 	}
 
@@ -88,24 +87,6 @@ enum Align
 		Right	= 1,
 	};
 
-// class ZCSprite
-// {
-// public:
-// 	ZCSprite();
-// 	ZCSprite(std::string file);
-
-// public:
-// 	bool LoadFile(std::string file);
-
-// public:
-// 	int32_t width = 0;
-// 	int32_t height = 0;
-// 	enum Mode { Outline, Fill };
-
-// public:
-// 	std::string Sample(float x, float y);
-// };
-
 class ZCEngine
 {
 
@@ -127,11 +108,6 @@ class ZCEngine
 		u_int8_t ScreenHeight();
 		u_int8_t TextLimit();
 
-		// Random Functions
-		float Noise(int32_t seed, int32_t x);
-		float Gaussian(int32_t dimension, int32_t seed, int32_t x);
-		float Perlin(int32_t seed, int32_t x, int32_t y);
-
 		// Conversion functions
 		std::string ctos(const char* c) { std::string s(c); return s;} // const char* to std::string
 		const char* stoc(std::string s) { return s.data(); } // std::string to const char*
@@ -139,7 +115,6 @@ class ZCEngine
 		int slen(std::string s) { return s.size(); } // size of string
 
 	public: // Draw Functions:
-
 		void DrawScreen();
 		void Draw(int32_t x, int32_t y, const char* text);
 		void DrawLine(int32_t x1, int32_t y1, int32_t x2, int32_t y2, const char* text);
@@ -149,7 +124,6 @@ class ZCEngine
 		void FillRect(int32_t x, int32_t y, int32_t w, int32_t h, const char* text);
 		void FillTriangle(int32_t x1, int32_t y1, int32_t x2, int32_t y2, int32_t x3, int32_t y3, const char* text);
 		void FillCircle(int32_t x, int32_t y, int32_t radius, const char* text);
-		//void DrawSprite(int32_t x, int32_t y, ZCSprite* sprite, uint32_t scale = 1);
 		void DrawString(int32_t x, int32_t y, const char* text, Align align);
 		void DrawString(int32_t x, int32_t y, std::string text, Align align);
 
@@ -159,6 +133,7 @@ class ZCEngine
 		u_int8_t	nTextLimit = 2;
 		u_int8_t	FrameRate = 60;
 		bool 		ENGINEACTIVE = 1;
+		int			KeyPressed;
 		std::vector<std::string> screen;
 
 	public: 
@@ -205,9 +180,14 @@ class ZCEngine
 	{
 		if(!Start())
 			ENGINEACTIVE = false;
+		else
+			DrawScreen();
 
 		auto t1 = std::chrono::system_clock::now();
 		auto t2 = std::chrono::system_clock::now();
+
+		std::thread k = std::thread(&ZCEngine::keyboardloop, this);
+		k.detach();
 
 		while(ENGINEACTIVE)
 		{
@@ -218,10 +198,11 @@ class ZCEngine
 				std::chrono::duration<float> t3 = t2-t1;
 				t1 = t2; DeltaTime += t3.count();
 			}
-			
 
 			if(!Update(DeltaTime))
 				ENGINEACTIVE = false;
+			else
+				DrawScreen();
 
 			if(Destroy())
 			{
@@ -707,27 +688,36 @@ class ZCEngine
 			}
 		}
 	}
-
-	float ZCEngine::Noise(int32_t seed, int32_t x)
+/* 
+	void ZCEngine::kbhit()
 	{
-		// Noise is  generated  randomly  with no  seed given
-		// the  value  returned  is a float  between 0 and 1.
+		struct termios oldt, newt;
+		int oldf;
 
-		return (sin( seed+x*sin(x+seed)-sin(seed) )+1)/2;
+		tcgetattr(STDIN_FILENO, &oldt);
+		newt = oldt;
+		newt.c_lflag &= ~(ICANON | ECHO);
+		tcsetattr(STDIN_FILENO, TCSANOW, &newt);
+		oldf = fcntl(STDIN_FILENO, F_GETFL, 0);
+		fcntl(STDIN_FILENO, F_SETFL, oldf | O_NONBLOCK);
+		
+		KeyPressed = getchar();
+
+		tcsetattr(STDIN_FILENO, TCSANOW, &oldt);
+		fcntl(STDIN_FILENO, F_SETFL, oldf);
+
+		if(KeyPressed != EOF)
+		{
+			ungetc(KeyPressed, stdin);
+		}
 	}
-
-	float ZCEngine::Gaussian(int32_t dimension, int32_t seed, int32_t x)
+ 
+	void ZCEngine::keyboardloop()
 	{
-		return 0;
+		while(1)
+		{
+			KeyPressed = getchar();
+		}
 	}
-
-	float ZCEngine::Perlin(int32_t seed, int32_t x, int32_t y)
-	{
-		// Like noise, but generates  the same thing with the
-		// same seed. Perlin smooths out the randomness noise
-		// generates. Still random, nonetheless.
-
-		return 0;
-	}
-
+*/
 } // End of ZCEngine definition
