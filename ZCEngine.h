@@ -64,15 +64,13 @@ other functions.  Update() if  overriden will run  continuously
 after the Start function until false is returned. The destroy()
 function will run once Update() finishes.
 
-The function DrawScreen() draws everything that is drawn to the
-screen using the other Draw functions. Draw() draws at a single
-point. DrawLine() draws a line from x, y, to x1, y1. DrawRect()
-draws a rectangle at x, y,  with a width of w, and height of h.
-DrawTriangle() draws a triangle at x1, y1 to x2, y2, to x3, y3.
-DrawCircle()  draws a  circle at x, y  with a radius.  The fill
-functions  are the  same thing and  fill the inside of all  the
-shapes.  DrawString()  will  draw  a  string  of  text at  x, y
-following with its alignment type.
+Draw() draws at a single point. DrawLine() draws a line from x,
+y, to x1,  y1.  DrawRect() draws a rectangle at x,  y,  with  a
+width of w, and height of h. DrawTriangle() draws a triangle at
+x1, y1 to x2, y2, to x3, y3. DrawCircle()  draws a  circle at x,
+y  with a radius.  The fill functions  are the  same thing  and
+fill the inside of all  the shapes.  DrawString()  will  draw a
+string  of  text at  x, y following with its alignment type.
 
 */
 
