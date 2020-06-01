@@ -19,7 +19,7 @@ std::uniform_int_distribution<int32_t> rnd(-2147483647, 2147483647);
 namespace ZCPP
 {
 	// The constant 𝜋
-	const long double Pi = 3.1415926535897932;
+	const double Pi = 3.1415926535897932;
 
 	// Converting Degress to Radians
 	const float DegtoRad = Pi * 2. / 360.;
@@ -51,26 +51,46 @@ namespace ZCPP
 	std::uniform_real_distribution<double> nrnd(min, max); return nrnd(rng);}
 
 	// Get percentage of where value is between min and max
-	template <typename Type> Type PercentagefromValue(Type min, Type max, Type value) { return (value - min) / (max - min); }
+	float PercentagefromValue(float min, float max, float value) { return (value - min) / (max - min); }
 	// Get value from percentage between min and max
-	template <typename Type> Type PercentagetoValue(Type min, Type max, Type percentage) { return max*percentage+min; }
+	float PercentagetoValue(float min, float max, float percentage) { return max*percentage+min; }
 
 	// Clamps any type of Value between min and max
 	template <typename Type> Type Clamp(Type min, Type max, Type Value) { if (max < min) std::swap(min, max); if (Value < min) return min; else if (Value > max) return max; else return Value; }
 
 	// Maps values from in-min and in-max to out-min and out-max
-	template <typename Type> Type Map(Type inMin, Type inMax, Type outMin, Type outMax, Type Value){ return PercentagetoValue(outMin, outMax, PercentagefromValue(inMin, inMax, Value)); }
+	template <typename Type> Type Map(Type inMin, Type inMax, Type outMin, Type outMax, Type Value){ return Type(PercentagetoValue(outMin, outMax, PercentagefromValue(inMin, inMax, Value))); }
+
+	// Swap two values with eachother
+	template <typename Type> void Swap(Type& Val_A, Type& Val_B) { Type temp = Val_A; Val_A = Val_B; Val_B = temp; }
+
+	// Returns the Min of the two, doesn't account if they are equal
+	template <typename Type> Type Min(Type Val_A, Type Val_B) { if (Val_A < Val_B) return Val_A; else return Val_B; }
+	// Returns the Max of the two, doesn't account if they are equal
+	template <typename Type> Type Max(Type Val_A, Type Val_B) { if (Val_A > Val_B) return Val_A; else return Val_B; }
+	
+	// Converts the Value into a std::string
+	template <typename Type> std::string ToString(Type Value) { return std::to_string(Value); }
 
 	// Vector classes:
+
+	class Vector2D;
+	class Vector3D;
+	class Quaternion;
 
 	class Vector2D // Vector2D class ( X, Y )
 	{
 	public:
 		float x, y;
 
-		Vector2D() { x = 0; y = 0; }
-		Vector2D(float _) { x = _; y = _; }
-		Vector2D(float _x, float _y) { x = _x; y = _y; }
+		Vector2D() : x(0), y(0) {}
+		Vector2D(float _) : x(_), y(_) {}
+		Vector2D(float _x, float _y) : x(_x), y(_y) {}
+
+		/* Casting Vector2D to Vector3D */
+		operator Vector3D() const { return Vector3D(x, y, 0); }
+		/* Casting Vector2D to Quaternion */
+		operator Quaternion() const { return Quaternion(0, x, y, 0); }
 
 		static float Length(Vector2D A) { return sqrt(A.x * A.x + A.y * A.y); }
 		float Length() { return Length(Vector2D(this->x,this->y)); }
@@ -84,14 +104,14 @@ namespace ZCPP
 		static Vector2D Random() { return Normalize(Vector2D(rnd(rng), rnd(rng))); }
 
 		// Converts A Vector2D into a std::string
-		static std::string ToString(Vector2D A) { return "<" + std::to_string(A.x) + ", " + std::to_string(A.y) + ">"; }
+		static std::string ToString(Vector2D A) { return "<" + ZCPP::ToString(A.x) + ", " + ZCPP::ToString(A.y) + ">"; }
 		// Converts this Vector2D into a std::string
-		std::string ToString() { return "< " + std::to_string(this->x) + ", " + std::to_string(this->y) + " >"; }
+		std::string ToString() { return "< " + ZCPP::ToString(this->x) + ", " + ZCPP::ToString(this->y) + " >"; }
 
 		// Returns the Max of both x's and both y's
-		static Vector2D Max(Vector2D A, Vector2D B) { Vector2D C; C.x = std::fmax(A.x, B.x); C.y = std::fmax(A.y, B.y); return C; }
+		static Vector2D Max(Vector2D A, Vector2D B) { Vector2D C; C.x = ZCPP::Max(A.x, B.x); C.y = ZCPP::Max(A.y, B.y); return C; }
 		// Returns the Min of both x's and both y's
-		static Vector2D Min(Vector2D A, Vector2D B) { Vector2D C; C.x = std::fmin(A.x, B.x); C.y = std::fmin(A.y, B.y); return C; }
+		static Vector2D Min(Vector2D A, Vector2D B) { Vector2D C; C.x = ZCPP::Min(A.x, B.x); C.y = ZCPP::Min(A.y, B.y); return C; }
 	};
 
 	/* Comparison Operators */
@@ -159,12 +179,14 @@ namespace ZCPP
 	public:
 		float x, y, z;
 
-		Vector3D() { x = 0; y = 0; z = 0; }
-		Vector3D(float _) { x = _; y = _; z = _; }
-		Vector3D(float _x, float _y, float _z) { x = _x; y = _y; z = _z; }
+		Vector3D() : x(0), y(0), z(0) {}
+		Vector3D(float _) : x(_), y(_), z(_) {}
+		Vector3D(float _x, float _y, float _z) : x(_x), y(_y), z(_z) {}
 
 		/* Casting Vector3D to Vector2D */
 		operator Vector2D() const { return Vector2D(x, y); }
+		/* Casting Vector3D to Quaternion */
+		operator Quaternion() const { return Quaternion(0, x, y, z); }
 
 		static float Length(Vector3D A) { return sqrt(A.x * A.x + A.y * A.y + A.z * A.z); }
 		float Length() { return Length(Vector3D(this->x, this->y, this->z)); }
@@ -176,14 +198,14 @@ namespace ZCPP
 		static Vector3D Random() { return Normalize(Vector3D(rnd(rng), rnd(rng), rnd(rng))); }
 
 		// Converts A Vector2D into a std::string
-		static std::string ToString(Vector3D A) { return "<" + std::to_string(A.x) + ", " + std::to_string(A.y) + ", " + std::to_string(A.z) + ">"; }
+		static std::string ToString(Vector3D A) { return "<" + ZCPP::ToString(A.x) + ", " + ZCPP::ToString(A.y) + ", " + ZCPP::ToString(A.z) + ">"; }
 		// Converts this Vector2D into a std::string
-		std::string ToString() { return "< " + std::to_string(this->x) + ", " + std::to_string(this->y) + ", " + std::to_string(this->z) + " >"; }
+		std::string ToString() { return "< " + ZCPP::ToString(this->x) + ", " + ZCPP::ToString(this->y) + ", " + ZCPP::ToString(this->z) + " >"; }
 
 		// Returns the Max of both x's and both y's and both z's
-		static Vector3D Max(Vector3D A, Vector3D B) { Vector3D C; C.x = std::fmax(A.x, B.x); C.y = std::fmax(A.y, B.y); C.z = std::fmax(A.z, B.z); return C; }
+		static Vector3D Max(Vector3D A, Vector3D B) { Vector3D C; C.x = ZCPP::Max(A.x, B.x); C.y = ZCPP::Max(A.y, B.y); C.z = ZCPP::Max(A.z, B.z); return C; }
 		// Returns the Min of both x's and both y's and both z's
-		static Vector3D Min(Vector3D A, Vector3D B) { Vector3D C; C.x = std::fmin(A.x, B.x); C.y = std::fmin(A.y, B.y); C.z = std::fmin(A.z, B.z); return C; }
+		static Vector3D Min(Vector3D A, Vector3D B) { Vector3D C; C.x = ZCPP::Min(A.x, B.x); C.y = ZCPP::Min(A.y, B.y); C.z = ZCPP::Min(A.z, B.z); return C; }
 	};
 
 	/* Comparison Operators */
@@ -250,12 +272,13 @@ namespace ZCPP
 	public:
 		float w, x, y, z;
 
-		Quaternion() { w = 1; x = 0; y = 0; z = 0; }
-		Quaternion(float _) { w = _; x = _; y = _; z = _; }
-		Quaternion(float _w, float _x, float _y, float _z) { w = _w; x = _x; y = _y; z = _z; }
+		Quaternion() : w(1), x(0), y(0), z(0) {}
+		Quaternion(float _) : w(_), x(_), y(_), z(_) {}
+		Quaternion(float _w, float _x, float _y, float _z) : w(_w), x(_x), y(_y), z(_z) {}
 
-		/* Casting Quaternion to Vector3D or Vector2D */
+		/* Casting Quaternion to Vector2D */
 		operator Vector2D() const { return Vector2D(x, y); }
+		/* Casting Quaternion to Vector3D */
 		operator Vector3D() const { return Vector3D(x, y, z); }
 
 		static float Length(Quaternion A) { return sqrt(A.w * A.w + A.x * A.x + A.y * A.y + A.z * A.z); }
@@ -266,8 +289,8 @@ namespace ZCPP
 		static Quaternion Abs(Quaternion A) { return Quaternion(abs(A.w), abs(A.x), abs(A.y), abs(A.z)); }
 		void Abs() { Quaternion Q = Abs(Quaternion(this->w, this->x, this->y, this->z)); this->w = Q.w;  this->x = Q.x; this->y = Q.y; this->z = Q.z; }
 
-		static std::string ToString(Quaternion A) { return "<" + std::to_string(A.w) + ", " + std::to_string(A.x) + ", " + std::to_string(A.y) + ", " + std::to_string(A.z) + ">"; }
-		std::string ToString() { return "< " + std::to_string(this->w) + ", " + std::to_string(this->x) + ", " + std::to_string(this->y) + ", " + std::to_string(this->z) + " >"; }
+		static std::string ToString(Quaternion A) { return "<" + ZCPP::ToString(A.w) + ", " + ZCPP::ToString(A.x) + ", " + ZCPP::ToString(A.y) + ", " + ZCPP::ToString(A.z) + ">"; }
+		std::string ToString() { return "< " + ZCPP::ToString(this->w) + ", " + ZCPP::ToString(this->x) + ", " + ZCPP::ToString(this->y) + ", " + ZCPP::ToString(this->z) + " >"; }
 	};
 
 	/* Comparison Operators */
