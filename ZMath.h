@@ -74,10 +74,6 @@ namespace ZCPP
 
 	// Vector classes:
 
-	class Vector2D;
-	class Vector3D;
-	class Quaternion;
-
 	class Vector2D // Vector2D class ( X, Y )
 	{
 	public:
@@ -86,11 +82,6 @@ namespace ZCPP
 		Vector2D() : x(0), y(0) {}
 		Vector2D(float _) : x(_), y(_) {}
 		Vector2D(float _x, float _y) : x(_x), y(_y) {}
-
-		/* Casting Vector2D to Vector3D */
-		operator Vector3D() const { return Vector3D(x, y, 0); }
-		/* Casting Vector2D to Quaternion */
-		operator Quaternion() const { return Quaternion(0, x, y, 0); }
 
 		static float Length(Vector2D A) { return sqrt(A.x * A.x + A.y * A.y); }
 		float Length() { return Length(Vector2D(this->x,this->y)); }
@@ -185,8 +176,6 @@ namespace ZCPP
 
 		/* Casting Vector3D to Vector2D */
 		operator Vector2D() const { return Vector2D(x, y); }
-		/* Casting Vector3D to Quaternion */
-		operator Quaternion() const { return Quaternion(0, x, y, z); }
 
 		static float Length(Vector3D A) { return sqrt(A.x * A.x + A.y * A.y + A.z * A.z); }
 		float Length() { return Length(Vector3D(this->x, this->y, this->z)); }
