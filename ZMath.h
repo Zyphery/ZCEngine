@@ -110,9 +110,9 @@ namespace ZCPP
 		// Converts this Vector2D into a std::string
 		std::string ToString() { return "< " + ZCPP::ToString(this->x) + ", " + ZCPP::ToString(this->y) + " >"; }
 
-		// Returns the Max of both x's and both y's
+		// Returns the Max of all the x's, and y's
 		static Vector2D Max(Vector2D A, Vector2D B) { Vector2D C; C.x = ZCPP::Max(A.x, B.x); C.y = ZCPP::Max(A.y, B.y); return C; }
-		// Returns the Min of both x's and both y's
+		// Returns the Min of all the x's, and y's
 		static Vector2D Min(Vector2D A, Vector2D B) { Vector2D C; C.x = ZCPP::Min(A.x, B.x); C.y = ZCPP::Min(A.y, B.y); return C; }
 	};
 
@@ -192,8 +192,6 @@ namespace ZCPP
 		Vector3D() : x(0), y(0), z(0) {}
 		Vector3D(float _) : x(_), y(_), z(_) {}
 		Vector3D(float _x, float _y, float _z) : x(_x), y(_y), z(_z) {}
-		Vector3D(Vector2D _xy) : x(_xy.x), y(_xy.y), z(0) {}
-		Vector3D(Vector2D _xy, float _z) : x(_xy.x), y(_xy.y), z(_z) {}
 
 		void operator = (const Vector3D& vec) { x = vec.x; y = vec.y; z = vec.z; }
 
@@ -201,7 +199,7 @@ namespace ZCPP
 		x, y, components are saved */
 		operator Vector2D() const { return Vector2D(x, y); }
 
-		static const Vector2D Vector2(Vector3D Q) { return Vector2D(Q.x, Q.y); }
+		static const Vector2D Vector2(Vector3D V) { return Vector2D(V.x, V.y); }
 		Vector2D Vector2() const { return Vector2(*this); }
 
 		static float Length(Vector3D A) { return sqrt(A.x * A.x + A.y * A.y + A.z * A.z); }
@@ -218,9 +216,9 @@ namespace ZCPP
 		// Converts this Vector2D into a std::string
 		std::string ToString() { return "< " + ZCPP::ToString(this->x) + ", " + ZCPP::ToString(this->y) + ", " + ZCPP::ToString(this->z) + " >"; }
 
-		// Returns the Max of both x's and both y's and both z's
+		// Returns the Max of all the x's, y's, and z's
 		static Vector3D Max(Vector3D A, Vector3D B) { Vector3D C; C.x = ZCPP::Max(A.x, B.x); C.y = ZCPP::Max(A.y, B.y); C.z = ZCPP::Max(A.z, B.z); return C; }
-		// Returns the Min of both x's and both y's and both z's
+		// Returns the Min of all the x's, y's, and z's
 		static Vector3D Min(Vector3D A, Vector3D B) { Vector3D C; C.x = ZCPP::Min(A.x, B.x); C.y = ZCPP::Min(A.y, B.y); C.z = ZCPP::Min(A.z, B.z); return C; }
 	};
 
@@ -322,6 +320,11 @@ namespace ZCPP
 
 		static std::string ToString(Quaternion A) { return "<" + ZCPP::ToString(A.w) + ", " + ZCPP::ToString(A.x) + ", " + ZCPP::ToString(A.y) + ", " + ZCPP::ToString(A.z) + ">"; }
 		std::string ToString() { return "< " + ZCPP::ToString(this->w) + ", " + ZCPP::ToString(this->x) + ", " + ZCPP::ToString(this->y) + ", " + ZCPP::ToString(this->z) + " >"; }
+
+		// Returns the Max of all the w's, x's, y's, and z's
+		static Quaternion Max(Quaternion A, Quaternion B) { Quaternion C; C.w = ZCPP::Max(A.w, B.w); C.x = ZCPP::Max(A.x, B.x); C.y = ZCPP::Max(A.y, B.y); C.z = ZCPP::Max(A.z, B.z); return C; }
+		// Returns the Min of all the w's, x's, y's, and z's
+		static Quaternion Min(Quaternion A, Quaternion B) { Quaternion C; C.w = ZCPP::Min(A.w, B.w); C.x = ZCPP::Min(A.x, B.x); C.y = ZCPP::Min(A.y, B.y); C.z = ZCPP::Min(A.z, B.z); return C; }
 	};
 
 	/* Comparison Operators */
