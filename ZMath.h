@@ -4,14 +4,16 @@
 #include <cmath>
 #include <random>
 
-// This math  library has no effect  on the main  ZCEngine  file.
-// This  is a separate  library  that can be used  along side the
-// base  engine.  The  library  holds 2D,  3D,  and  4D  classes.
-// They all  have overloaded  operators to do  basic and  special
-// math  functions  such  as  adding,  subtracting,  multiplying,
-// dividing,  and  normalizing.  The  add and subtract  functions
-// only work on  2 vectors.  The multiply  and divide  can use  a
-// vector or float. More detail can be found inside the namespace
+// This is a math library for my namespace ZCPP. This math library
+// Comes with multiple vector types and matrix classes. 2D vectors,
+// 3D vectors, 4D vectors, 3x3 matricies, and 4x4 matricies. Each
+// with their own overloaded operators and math functions. This file
+// also comes with some basic math functions and tools. Such as: Pi,
+// Random (int, float, double), a conversion of Degrees to Radians,
+// and Radians to Degrees. Several base functions (that I made), Swap,
+// Clamp, Map, Abs, ToString, and several other useful functions.
+// I am still working on this file so updates will come, Expect them soon! :D
+// -Zyphery
 
 std::random_device device; std::mt19937 rng(device());
 std::uniform_int_distribution<int32_t> rnd(-2147483647, 2147483647);
@@ -26,36 +28,6 @@ namespace ZCPP
 	// Converting Radians to Degrees
 	const float RadtoDeg = 1. / DegtoRad;
 
-	/* Int32 Random ( -2147483647, 2147483647 ) */
-	// Returns a random number between -2147483647, 2147483647 in int form
-	int32_t Random() { return rnd(rng); }
-	// Returns a random number between the min and max in int form
-	int32_t Random(int32_t min, int32_t max)
-	{
-		if (max < min) std::swap(min, max); if (min == max) return max;
-		std::uniform_int_distribution<int32_t> nrnd(min, max); return nrnd(rng);
-	}
-
-	/* Float Random ( -1, 1 ) */
-	// 25 decimal point precision
-	// Returns a random number between -1 and 1 in float form
-	float Randomf() { std::uniform_real_distribution<float> nrnd(-1, 1); return nrnd(rng); }
-	// Returns a random number between the min and max in float form
-	float Randomf(float min, float max) {
-		if (max < min) std::swap(min, max); if (min == max) return max;
-		std::uniform_real_distribution<float> nrnd(min, max); return nrnd(rng);
-	}
-
-	/* Double Random ( -1, 1 ) */
-	// 50 decimal point precision
-	// Returns a random number between -1 and 1 in double form
-	double Randomd() { std::uniform_real_distribution<double> nrnd(-1, 1); return nrnd(rng); }
-	// Returns a random number between the min and max in double form
-	double Randomd(double min, double max) {
-		if (max < min) std::swap(min, max); if (min == max) return max;
-		std::uniform_real_distribution<double> nrnd(min, max); return nrnd(rng);
-	}
-
 	// Get percentage of where value is between min and max
 	float PercentagefromValue(float min, float max, float value) { return (value - min) / (max - min); }
 	// Get value from percentage between min and max
@@ -63,7 +35,7 @@ namespace ZCPP
 
 	// Swap two values with eachother
 	template <typename Type> void Swap(Type& Val_A, Type& Val_B) { Type temp = Val_A; Val_A = Val_B; Val_B = temp; }
-	
+
 	// Clamps any type of Value between min and max
 	template <typename Type> Type Clamp(Type min, Type max, Type Value) { if (max < min) Swap(min, max); if (Value < min) return min; else if (Value > max) return max; else return Value; }
 
@@ -81,6 +53,36 @@ namespace ZCPP
 
 	// Converts the Value into a std::string
 	template <typename Type> std::string ToString(Type Value) { return std::to_string(Value); }
+
+	/* Int32 Random ( -2147483647, 2147483647 ) */
+	// Returns a random number between -2147483647, 2147483647 in int form
+	int32_t Random() { return rnd(rng); }
+	// Returns a random number between the min and max in int form
+	int32_t Random(int32_t min, int32_t max)
+	{
+		if (max < min) Swap(min, max); if (min == max) return max;
+		std::uniform_int_distribution<int32_t> nrnd(min, max); return nrnd(rng);
+	}
+
+	/* Float Random ( -1, 1 ) */
+	// 25 decimal point precision
+	// Returns a random number between -1 and 1 in float form
+	float Randomf() { std::uniform_real_distribution<float> nrnd(-1, 1); return nrnd(rng); }
+	// Returns a random number between the min and max in float form
+	float Randomf(float min, float max) {
+		if (max < min) Swap(min, max); if (min == max) return max;
+		std::uniform_real_distribution<float> nrnd(min, max); return nrnd(rng);
+	}
+
+	/* Double Random ( -1, 1 ) */
+	// 50 decimal point precision
+	// Returns a random number between -1 and 1 in double form
+	double Randomd() { std::uniform_real_distribution<double> nrnd(-1, 1); return nrnd(rng); }
+	// Returns a random number between the min and max in double form
+	double Randomd(double min, double max) {
+		if (max < min) std::swap(min, max); if (min == max) return max;
+		std::uniform_real_distribution<double> nrnd(min, max); return nrnd(rng);
+	}
 
 	// Vector classes:
 
@@ -194,6 +196,8 @@ namespace ZCPP
 		Vector3D(float _) : x(_), y(_), z(_) {}
 		Vector3D(float _x, float _y, float _z) : x(_x), y(_y), z(_z) {}
 
+		Vector3D(Vector2D _V, float _z) : x(_V.x), y(_V.y), z(_z) {}
+
 		void operator = (const Vector3D& vec) { x = vec.x; y = vec.y; z = vec.z; }
 
 		/* Casting Vector3D to Vector2D
@@ -298,6 +302,9 @@ namespace ZCPP
 		Quaternion(float _) : x(_), y(_), z(_), w(_) {}
 		Quaternion(float _x, float _y, float _z, float _w) : x(_x), y(_y), z(_z), w(_w) {}
 
+		Quaternion(Vector2D _V, float _z, float _w) : x(_V.x), y(_V.y), z(_z), w(_w) {}
+		Quaternion(Vector3D _V, float _w) : x(_V.x), y(_V.y), z(_V.z), w(_w) {}
+
 		void operator = (const Quaternion& q) { w = q.w; x = q.x; y = q.y; z = q.z; }
 
 		/* Casting Quaternion to Vector2D 
@@ -399,7 +406,7 @@ namespace ZCPP
 	public:
 		float M[3][3] = { 0 };
 
-		void operator = (const Matrix3& m) { *this = m; }
+		void operator = (const Matrix3& m) { for (int i = 0; i < 3; i++) for (int j = 0; j < 3; j++) this->M[i][j] = m.M[i][j]; }
 
 		static Matrix3 Identity() { Matrix3 M;  M.M[0][0] = 1; M.M[1][1] = 1; M.M[2][2] = 1; return M; }
 
@@ -496,49 +503,12 @@ namespace ZCPP
 		// Rotate a Vector2D by r
 		static Vector2D Rotate(float r, Vector2D V)
 		{
-			Matrix3 M;
+			Matrix3 M = Matrix3::Identity();
 			M.M[0][0] = cosf(r);
 			M.M[0][1] = -sinf(r);
 			M.M[1][0] = sinf(r);
 			M.M[1][1] = cosf(r);
 			return Multiply(M,V).To2D();
-		}
-
-		// Rotate a Vector3D by r a 3D axis rotation
-		static Vector3D Rotate(Vector3D r, Vector3D V)
-		{
-			Vector3D NewV = V;
-			if (r.x != 0)
-			{
-				Matrix3 xR = Identity();
-				xR.M[1][1] = cosf(r.x);
-				xR.M[1][2] = sinf(r.x);
-				xR.M[2][1] = -sinf(r.x);
-				xR.M[2][2] = cosf(r.x);
-				NewV = Multiply(xR, NewV);
-			}
-
-			if (r.y != 0)
-			{
-				Matrix3 yR = Identity();
-				yR.M[0][0] = cosf(r.y);
-				yR.M[2][0] = -sinf(r.y);
-				yR.M[2][0] = sinf(r.y);
-				yR.M[2][2] = cosf(r.y);
-				NewV = Multiply(yR, NewV);
-			}
-
-			if (r.z != 0)
-			{
-				Matrix3 zR = Identity();
-				zR.M[0][0] = cosf(r.z);
-				zR.M[0][1] = sinf(r.z);
-				zR.M[1][0] = -sinf(r.z);
-				zR.M[1][1] = cosf(r.z);
-				NewV = Multiply(zR, NewV);
-			}
-
-			return NewV;
 		}
 	};
 
@@ -583,7 +553,7 @@ namespace ZCPP
 	public:
 		float M[4][4] = { 0 };
 
-		void operator = (const Matrix4& m) { *this = m; }
+		void operator = (const Matrix4& m) { for (int i = 0; i < 4; i++) for (int j = 0; j < 4; j++) this->M[i][j] = m.M[i][j]; }
 
 		static Matrix4 Identity() { Matrix4 M;  M.M[0][0] = 1; M.M[1][1] = 1; M.M[2][2] = 1; M.M[3][3] = 1; return M; }
 
@@ -693,6 +663,107 @@ namespace ZCPP
 		
 		// Divide a Vector3D by a 4x4 Matrix
 		static Quaternion Divide(Matrix4 M, Vector3D V) { return Divide(M, Quaternion(V.x, V.y, V.z, 1)); }
+
+		// 3D stuff
+
+		static Matrix4 Inverse(Matrix4 m)
+		{
+
+		}
+
+		static Matrix4 Translate(Vector3D pos)
+		{
+			Matrix4 m = Matrix4::Identity();
+			m.M[0][3] = pos.x;
+			m.M[1][3] = -pos.y;
+			m.M[2][3] = pos.z;
+			return m;
+		}
+
+		static Matrix4 Scale(Vector3D scl)
+		{
+			Matrix4 m = Matrix4::Identity();
+			m.M[0][0] = scl.x;
+			m.M[1][1] = scl.y;
+			m.M[2][2] = scl.z;
+			return m;
+		}
+
+		static Matrix4 Rotate(Vector3D r)
+		{
+			Matrix4 m = Identity();
+			if (r.x != 0)
+			{
+				Matrix4 xR = Identity();
+				xR.M[1][1] = cosf(r.x);
+				xR.M[1][2] = sinf(r.x);
+				xR.M[2][1] = -sinf(r.x);
+				xR.M[2][2] = cosf(r.x);
+				m = Multiply(xR, m);
+			}
+
+			if (r.y != 0)
+			{
+				Matrix4 yR = Identity();
+				yR.M[0][0] = cosf(r.y);
+				yR.M[0][2] = -sinf(r.y);
+				yR.M[2][0] = sinf(r.y);
+				yR.M[2][2] = cosf(r.y);
+				m = Multiply(yR, m);
+			}
+
+			if (r.z != 0)
+			{
+				Matrix4 zR = Identity();
+				zR.M[0][0] = cosf(r.z);
+				zR.M[0][1] = sinf(r.z);
+				zR.M[1][0] = -sinf(r.z);
+				zR.M[1][1] = cosf(r.z);
+				m = Multiply(zR, m);
+			}
+			return m;
+		}
+
+		static Matrix4 LookAt(Vector3D eye, Vector3D at, Vector3D up)
+		{
+			Vector3D zAxis = Vector3D::Normalize(eye - at);
+			Vector3D xAxis = Vector3D::Normalize(CP3D(zAxis, up));
+			Vector3D yAxis = CP3D(xAxis, zAxis);
+
+			zAxis *= -1;
+
+			Matrix4 vM;
+			vM.M[0][0] = xAxis.x; vM.M[0][1] = xAxis.y; vM.M[0][2] = xAxis.z; vM.M[0][3] = -DP3D(xAxis, eye);
+			vM.M[0][0] = yAxis.x; vM.M[0][1] = yAxis.y; vM.M[0][2] = yAxis.z; vM.M[0][3] = -DP3D(yAxis, eye);
+			vM.M[0][0] = zAxis.x; vM.M[0][1] = zAxis.y; vM.M[0][2] = zAxis.z; vM.M[0][3] = -DP3D(zAxis, eye);
+			vM.M[3][3] = 1;
+			return vM;
+		}
+
+		static Matrix4 Camera_PerspectiveProjection(float Znear, float Zfar, float rFOV, float AP)
+		{
+			Matrix4 m;
+			m.M[0][0] = 1 / (AP * tanf(rFOV / 2));
+			m.M[1][1] = 1 / (tanf(rFOV / 2));
+			m.M[2][2] = -((Zfar + Znear) / (Zfar - Znear));
+			m.M[3][2] = -1;
+			m.M[2][3] = -((2 * Zfar * Znear) / (Zfar-Znear));
+			return m;
+		}
+
+		static Matrix4 Camera_OrthographicProjection(float left, float right, float top, float bottom, float Znear, float Zfar)
+		{
+			Matrix4 m;
+			m.M[0][0] = 2 / (right - left);
+			m.M[1][1] = 2 / (top - bottom);
+			m.M[2][2] = -2 / (Zfar - Znear);
+			m.M[0][3] = -((right + left) / (right - left));
+			m.M[1][3] = -((top + bottom) / (top - bottom));
+			m.M[2][3] = -((Zfar + Znear) / (Zfar - Znear));
+			m.M[3][3] = 1;
+			return m;
+		}
+
 	};
 
 	// Add two 4x4 Matricies
@@ -728,16 +799,4 @@ namespace ZCPP
 	Quaternion operator *= (Vector3D& A, const Matrix4& B) { return Matrix4::Multiply(B, A); }
 	Quaternion operator /= (Quaternion& A, const Matrix4& B) { A = A / B; return A; }
 	Quaternion operator /= (Vector3D& A, const Matrix4& B) { return Matrix4::Divide(B, A); }
-
-	Matrix4 Camera_PerspectiveProjection(float Znear, float Zfar, float rFOV, float AP)
-	{
-		Matrix4 Proj;
-		Proj.M[0][0] = 1 / (AP * tanf(rFOV / 2));
-		Proj.M[1][1] = 1 / (tanf(rFOV / 2));
-		Proj.M[2][2] = -((Zfar + Znear) / (Zfar - Znear));
-		Proj.M[3][2] = -1;
-		Proj.M[2][3] = -((2 * Zfar * Znear) / (Zfar-Znear));
-		return Proj;
-	}
-
 };
