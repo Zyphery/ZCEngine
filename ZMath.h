@@ -17,6 +17,8 @@
 
 namespace ZCPP
 {
+#define INFINITE 1000000000
+
 	std::random_device device; std::mt19937 rng(device());
 	std::uniform_int_distribution<int32_t> rnd(-2147483647, 2147483647);
 
@@ -33,13 +35,48 @@ namespace ZCPP
 	// Swap two values with eachother
 	template <typename Type> void Swap(Type& Val_A, Type& Val_B) { Type temp = Val_A; Val_A = Val_B; Val_B = temp; }
 
+	/* Int32 Random ( -2147483647, 2147483647 ) */
+	// Returns a random number between -2147483647, 2147483647 in int form
+	int32_t Random() { return rnd(rng); }
+	// Returns a random number between the min and max in int form
+	int32_t Random(int32_t min, int32_t max) {
+		if (max < min) Swap(min, max); if (min == max) return max;
+		std::uniform_int_distribution<int32_t> nrnd(min, max); return nrnd(rng);
+	}
+
+	/* float Random ( -1, 1 ) */
+	// 25 decimal point precision
+	// Returns a random number between -1 and 1 in float form
+	float Randomf() { std::uniform_real_distribution<float> nrnd(-1, 1); return nrnd(rng); }
+	// Returns a random number between the min and max in float form
+	float Randomf(float min, float max) {
+		if (max < min) Swap(min, max); if (min == max) return max;
+		std::uniform_real_distribution<float> nrnd(min, max); return nrnd(rng);
+	}
+
+	/* float Random ( -1, 1 ) */
+	// 50 decimal point precision
+	// Returns a random number between -1 and 1 in float form
+	float Randomd() { std::uniform_real_distribution<float> nrnd(-1, 1); return nrnd(rng); }
+	// Returns a random number between the min and max in float form
+	float Randomd(float min, float max) {
+		if (max < min) Swap(min, max); if (min == max) return max;
+		std::uniform_real_distribution<float> nrnd(min, max); return nrnd(rng);
+	}
+
 	// Returns bool if Value is a Whole number
 	bool IsWhole(float Value) { return ((Value - int(Value)) == 0); }
 
 	// Value to the Nth power
 	float Pow(float Value, float Power) { return pow(Value, Power); }
 	// Value to the Nth root
-	float Root(float Value, float Root) { if (Root == 0) return Value; else return Pow(Value, 1 / Root); }
+	float Root(float Value, float Root) { if (Root == 0) return INFINITE; else return Pow(Value, 1 / Root); }
+
+	// Quick square root
+	float Sqrt(float Value) { return sqrt(Value); }
+
+	// Quick square power
+	float Sqr(float Value) { return (Value * Value); }
 
 	// Returns the greatest integer 
 	int Floor(float Value) { if (IsWhole(Value)) return Value; int Ivalue = int(Value); if (Value < 0) return int(Value) - 1; else return int(Value); }
@@ -59,6 +96,13 @@ namespace ZCPP
 
 	// Factorial cannot go higher than 65
 	uint64_t Fac(unsigned short int iter) { uint64_t fac = 1; for (int i = 1; i <= iter && i < 66; i++) fac *= i; return fac; }
+
+	// Sine function
+	float Sin(float Value) { return sinf(Value); }
+	// Cosine function
+	float Cos(float Value) { return cosf(Value); }
+	// Tangent function
+	float Tan(float Value) { return tanf(Value); }
 
 	// Get percentage of where value is between min and max
 	float PercentagefromValue(float min, float max, float value) { return (value - min) / (max - min); }
@@ -98,40 +142,18 @@ namespace ZCPP
 	// Reverses an array
 	template <typename Type> void Reverse(Type* Array, uint32_t size) { for (int32_t index = 0, revindex = size - 1; index < size / 2; index++, revindex--) { Swap(Array[index], Array[revindex]); } }
 
-	/* Int32 Random ( -2147483647, 2147483647 ) */
-	// Returns a random number between -2147483647, 2147483647 in int form
-	int32_t Random() { return rnd(rng); }
-	// Returns a random number between the min and max in int form
-	int32_t Random(int32_t min, int32_t max) {
-		if (max < min) Swap(min, max); if (min == max) return max;
-		std::uniform_int_distribution<int32_t> nrnd(min, max); return nrnd(rng);
-	}
+	// Randomizes an array
+	template <typename Type> void Randomize(Type* Array, uint32_t size) { for (int32_t index = 0; index < size; index++) Swap(Array[index], Array[Random(0, size - 1)]); }
 
-	/* float Random ( -1, 1 ) */
-	// 25 decimal point precision
-	// Returns a random number between -1 and 1 in float form
-	float Randomf() { std::uniform_real_distribution<float> nrnd(-1, 1); return nrnd(rng); }
-	// Returns a random number between the min and max in float form
-	float Randomf(float min, float max) {
-		if (max < min) Swap(min, max); if (min == max) return max;
-		std::uniform_real_distribution<float> nrnd(min, max); return nrnd(rng);
-	}
-
-	/* float Random ( -1, 1 ) */
-	// 50 decimal point precision
-	// Returns a random number between -1 and 1 in float form
-	float Randomd() { std::uniform_real_distribution<float> nrnd(-1, 1); return nrnd(rng); }
-	// Returns a random number between the min and max in float form
-	float Randomd(float min, float max) {
-		if (max < min) std::swap(min, max); if (min == max) return max;
-		std::uniform_real_distribution<float> nrnd(min, max); return nrnd(rng);
-	}
+	// Returns if the array is sorted
+	template <typename Type> bool IsSorted(Type* Array, uint32_t size) { for (int32_t index = 1; index < size; index++) if ((Array[index - 1] < Array[index])) return false; return true; }
 
 	// Console Log function:
 
 	void Log(const char* c) { printf("%s\n", c); }
 	void Log(std::string s) { printf("%s\n", s.c_str()); }
 
+	void Log(bool b) { if(b) Log("False"); else Log("True"); }
 	void Log(int i) { Log(ToString(i)); }
 	void Log(long i) { Log(ToString(i)); }
 	void Log(long long i) { Log(ToString(i)); }
@@ -155,15 +177,15 @@ namespace ZCPP
 
 		void operator = (const Vector2D& vec) { x = vec.x; y = vec.y; }
 
-		static float Length(Vector2D A) { return sqrt(A.x * A.x + A.y * A.y); }
+		static float Length(Vector2D A) { return Sqrt(Sqr(A.x) + Sqr(A.y)); }
 		float Length() { return Length(*this); }
-		static float Distance(Vector2D A, Vector2D B) { return sqrt(pow(B.x - A.x, 2) + pow(B.y - A.y, 2)); }
+		static float Distance(Vector2D A, Vector2D B) { return Sqrt(Sqr(B.x - A.x) + Sqr(B.y - A.y)); }
 		static Vector2D Normalize(Vector2D A) { float L = 1 / Length(A); return Vector2D(A.x * L, A.y * L); }
 		void Normalize() { *this = Normalize(*this); }
 		static Vector2D Abs(Vector2D A) { return Vector2D(ZCPP::Abs(A.x), ZCPP::Abs(A.y)); }
 		void Abs() { *this = Abs(*this); }
 		Vector2D UnitVector() { return Normalize(*this); }
-		static Vector2D Rotate(Vector2D A, float r) { Vector2D V; V.x = A.x * cos(r) - A.y * sin(r); V.y = sin(r) * A.x + cos(r) * A.y; return V; }
+		static Vector2D Rotate(Vector2D A, float r) { Vector2D V; V.x = A.x * Cos(r) - A.y * Sin(r); V.y = Sin(r) * A.x + Cos(r) * A.y; return V; }
 		void Rotate(float r) { *this = Rotate(*this, r); }
 		static Vector2D Random() { return Normalize(Vector2D(rnd(rng), rnd(rng))); }
 
@@ -268,9 +290,9 @@ namespace ZCPP
 
 		static Vector2D To2D(Vector3D A) { return Vector2D(A.x, A.y); }
 		Vector2D To2D() { return To2D(*this); }
-		static float Length(Vector3D A) { return sqrt(A.x * A.x + A.y * A.y + A.z * A.z); }
+		static float Length(Vector3D A) { return Sqrt(Sqr(A.x) + Sqr(A.y) + Sqr(A.z)); }
 		float Length() { return Length(*this); }
-		static float Distance(Vector3D A, Vector3D B) { return sqrt(pow(B.x - A.x, 2) + pow(B.y - A.y, 2) + pow(B.z - A.z, 2)); }
+		static float Distance(Vector3D A, Vector3D B) { return Sqrt(Sqr(B.x - A.x) + Sqr(B.y - A.y) + Sqr(B.z - A.z)); }
 		static Vector3D Normalize(Vector3D A) { float L = 1 / Length(A); return Vector3D(A.x * L, A.y * L, A.z * L); }
 		void Normalize() { *this = Normalize(*this); }
 		Vector3D UnitVector() { return Normalize(*this); }
@@ -383,9 +405,9 @@ namespace ZCPP
 		Vector2D To2D() { return To2D(*this); }
 		static Vector3D To3D(Quaternion A) { return Vector3D(A.x, A.y, A.z); }
 		Vector3D To3D() { return To3D(*this); }
-		static float Length(Quaternion A) { return sqrt(A.x * A.x + A.y * A.y + A.z * A.z + A.w * A.w); }
+		static float Length(Quaternion A) { return Sqrt(Sqr(A.x) + Sqr(A.y) + Sqr(A.z) + Sqr(A.w)); }
 		float Length() { return Length(*this); }
-		static float Distance(Quaternion A, Quaternion B) { return sqrt(pow(B.x - A.x, 2) + pow(B.y - A.y, 2) + pow(B.z - A.z, 2) + pow(B.w - A.w, 2)); }
+		static float Distance(Quaternion A, Quaternion B) { return Sqrt(Sqr(B.x - A.x) + Sqr(B.y - A.y) + Sqr(B.z - A.z) + Sqr(B.w - A.w)); }
 		static Quaternion Normalize(Quaternion A) { float L = 1 / Length(A); return Quaternion(A.x * L, A.y * L, A.z * L, A.w * L); }
 		void Normalize() { *this = Normalize(*this); }
 		Quaternion UnitQuaternion() { return Normalize(*this); }
@@ -494,12 +516,12 @@ namespace ZCPP
 	Quaternion EulerToQuaternion(Vector3D A)
 	{
 		Quaternion quat;
-		float cy = cosf(A.z / 2);
-		float sy = sinf(A.z / 2);
-		float cp = cosf(A.y / 2);
-		float sp = sinf(A.y / 2);
-		float cr = cosf(A.x / 2);
-		float sr = sinf(A.x / 2);
+		float cy = Cos(A.z / 2);
+		float sy = Sin(A.z / 2);
+		float cp = Cos(A.y / 2);
+		float sp = Sin(A.y / 2);
+		float cr = Cos(A.x / 2);
+		float sr = Sin(A.x / 2);
 
 		quat.w = cr * cp * cy + sr * sp * sy;
 		quat.x = sr * cp * cy - cr * sp * sy;
@@ -535,7 +557,7 @@ namespace ZCPP
 
 	Quaternion RotateVector(Vector3D Vector, Vector3D Axis, float r)
 	{
-		Quaternion q = Quaternion(Axis.UnitVector() * sinf(r / 2), cosf(r / 2));
+		Quaternion q = Quaternion(Axis.UnitVector() * Sin(r / 2), Cos(r / 2));
 		Quaternion VectorP = Multiply(Multiply(q, Quaternion(Vector, 0)), Conjugate(q));
 
 		return VectorP;
@@ -651,10 +673,10 @@ namespace ZCPP
 		static Vector2D Rotate(float r, Vector2D V)
 		{
 			Matrix3 M = Matrix3::Identity();
-			M.M[0][0] = cosf(r);
-			M.M[0][1] = -sinf(r);
-			M.M[1][0] = sinf(r);
-			M.M[1][1] = cosf(r);
+			M.M[0][0] = Cos(r);
+			M.M[0][1] = -Sin(r);
+			M.M[1][0] = Sin(r);
+			M.M[1][1] = Cos(r);
 			return Multiply(M, V).To2D();
 		}
 	};
@@ -838,30 +860,30 @@ namespace ZCPP
 			if (r.z != 0)
 			{
 				Matrix4 zR = Identity();
-				zR.M[0][0] = cosf(r.z);
-				zR.M[0][1] = sinf(r.z);
-				zR.M[1][0] = -sinf(r.z);
-				zR.M[1][1] = cosf(r.z);
+				zR.M[0][0] = Cos(r.z);
+				zR.M[0][1] = Sin(r.z);
+				zR.M[1][0] = -Sin(r.z);
+				zR.M[1][1] = Cos(r.z);
 				m = Multiply(zR, m);
 			}
 
 			if (r.x != 0)
 			{
 				Matrix4 xR = Identity();
-				xR.M[1][1] = cosf(r.x);
-				xR.M[1][2] = sinf(r.x);
-				xR.M[2][1] = -sinf(r.x);
-				xR.M[2][2] = cosf(r.x);
+				xR.M[1][1] = Cos(r.x);
+				xR.M[1][2] = Sin(r.x);
+				xR.M[2][1] = -Sin(r.x);
+				xR.M[2][2] = Cos(r.x);
 				m = Multiply(xR, m);
 			}
 
 			if (r.y != 0)
 			{
 				Matrix4 yR = Identity();
-				yR.M[0][0] = cosf(r.y);
-				yR.M[0][2] = -sinf(r.y);
-				yR.M[2][0] = sinf(r.y);
-				yR.M[2][2] = cosf(r.y);
+				yR.M[0][0] = Cos(r.y);
+				yR.M[0][2] = -Sin(r.y);
+				yR.M[2][0] = Sin(r.y);
+				yR.M[2][2] = Cos(r.y);
 				m = Multiply(yR, m);
 			}
 			return m;
@@ -879,8 +901,8 @@ namespace ZCPP
 		static Matrix4 Camera_PerspectiveProjection(float Znear, float Zfar, float rFOV, float AP)
 		{
 			Matrix4 m;
-			m.M[0][0] = 1 / (AP * tanf(rFOV / 2));
-			m.M[1][1] = -1 / (tanf(rFOV / 2));
+			m.M[0][0] = 1 / (AP * Tan(rFOV / 2));
+			m.M[1][1] = -1 / (Tan(rFOV / 2));
 			m.M[2][2] = ((Zfar - Znear) / (Zfar - Znear));
 			m.M[3][2] = 1;
 			m.M[2][3] = ((2 * Zfar * Znear) / (Zfar - Znear));
@@ -894,8 +916,8 @@ namespace ZCPP
 			Matrix4 m;
 			m.M[0][0] = 2 / (right - left);
 			m.M[1][1] = -2 / (top - bottom);
-			m.M[2][2] = -2 / (Zfar - Znear);
-			m.M[0][3] = -((right + left) / (right - left));
+			m.M[2][2] = 2 / (Zfar - Znear);
+			m.M[0][3] = ((right + left) / (right - left));
 			m.M[1][3] = ((top + bottom) / (top - bottom));
 			m.M[2][3] = -((Zfar + Znear) / (Zfar - Znear));
 			m.M[3][3] = 1;
