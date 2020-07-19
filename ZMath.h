@@ -35,6 +35,18 @@ namespace ZCPP
 	// Swap two values with eachother
 	template <typename Type> void Swap(Type& Val_A, Type& Val_B) { Type temp = Val_A; Val_A = Val_B; Val_B = temp; }
 
+	// Returns the Min of the two, doesn't account if they are equal
+	template <typename Type> Type Min(Type Val_A, Type Val_B) { if (Val_A < Val_B) return Val_A; return Val_B; }
+	// Returns the Max of the two, doesn't account if they are equal
+	template <typename Type> Type Max(Type Val_A, Type Val_B) { if (Val_A > Val_B) return Val_A; return Val_B; }
+
+	// Returns the absolute Value of Value
+	template <typename Type> Type Abs(Type Value) { if (Value < 0) return -Value; return Value; }
+	// Returns the signed Value of Value
+	template <typename Type> Type Sign(Type Value) { if (Value < 0) return Value; return -Value; }
+	
+	//template <typename Type> Type CopySign(Type Value, Type Sign) { std::copysign(Value, Sign); }
+
 	/* Int32 Random ( -2147483647, 2147483647 ) */
 	// Returns a random number between -2147483647, 2147483647 in int form
 	int32_t Random() { return rnd(rng); }
@@ -70,7 +82,7 @@ namespace ZCPP
 	// Value to the Nth power
 	float Pow(float Value, float Power) { return pow(Value, Power); }
 	// Value to the Nth root
-	float Root(float Value, float Root) { if (Root == 0) return INFINITE; else return Pow(Value, 1 / Root); }
+	float Root(float Value, float Root) { if (Root == 0) return INFINITE; return Pow(Value, 1 / Root); }
 
 	// Quick square root
 	float Sqrt(float Value) { return sqrt(Value); }
@@ -79,20 +91,12 @@ namespace ZCPP
 	float Sqr(float Value) { return (Value * Value); }
 
 	// Returns the greatest integer 
-	int Floor(float Value) { if (IsWhole(Value)) return Value; int Ivalue = int(Value); if (Value < 0) return int(Value) - 1; else return int(Value); }
-
-	// Returns the Min of the two, doesn't account if they are equal
-	template <typename Type> Type Min(Type Val_A, Type Val_B) { if (Val_A < Val_B) return Val_A; else return Val_B; }
-	// Returns the Max of the two, doesn't account if they are equal
-	template <typename Type> Type Max(Type Val_A, Type Val_B) { if (Val_A > Val_B) return Val_A; else return Val_B; }
-
-	// Returns the absolute Value of Value
-	template <typename Type> Type Abs(Type Value) { if (Value < 0) return -Value; else return Value; }
-	// Returns the signed Value of Value
-	template <typename Type> Type Sign(Type Value) { if (Value < 0) return Value; else return -Value; }
+	int Floor(float Value) { if (IsWhole(Value)) return Value; if (Value < 0) return int(Value) - 1; return int(Value); }
+	// Rounds out Value if value decimal is greater than .5, round up, else round down
+	int Round(float Value) { if (IsWhole(Value)) return Value; if (Value < .5) return int(Value) + 1; else if (Value < -.5) return int(Value); return int(Value); }
 
 	// Modulator ( Gets the remainder after a "division" )
-	float Mod(float Value, float Modulator) { while (Value >= Modulator) { Value -= Modulator; } return Value; }
+	float Mod(float Value, float Modulator) { if (Value < Modulator) return Value; else while (Value >= Modulator) { Value -= Modulator; } return Value; }
 
 	// Factorial cannot go higher than 65
 	uint64_t Fac(unsigned short int iter) { uint64_t fac = 1; for (int i = 1; i <= iter && i < 66; i++) fac *= i; return fac; }
@@ -153,7 +157,7 @@ namespace ZCPP
 	void Log(const char* c) { printf("%s\n", c); }
 	void Log(std::string s) { printf("%s\n", s.c_str()); }
 
-	void Log(bool b) { if(b) Log("False"); else Log("True"); }
+	void Log(bool b) { if (b) { Log("True"); return; } Log("False"); }
 	void Log(int i) { Log(ToString(i)); }
 	void Log(long i) { Log(ToString(i)); }
 	void Log(long long i) { Log(ToString(i)); }
@@ -235,12 +239,12 @@ namespace ZCPP
 	// Multiply a Vector2D by a float
 	Vector2D operator * (const Vector2D& A, const float& B) { return Vector2D(A.x * B, A.y * B); }
 	// Multiply a Vector2D by a float
-	Vector2D operator * (const float& A, const Vector2D& B) { return(B * A); }
+	Vector2D operator * (const float& A, const Vector2D& B) { return Vector2D(A * B.x, A * B.y); }
 
 	// Divide a Vector2D by a float
 	Vector2D operator / (const Vector2D& A, const float& B) { return Vector2D(A.x / B, A.y / B); }
 	// Divide a Vector2D by a float
-	Vector2D operator / (const float& A, const Vector2D& B) { return (B / A); }
+	Vector2D operator / (const float& A, const Vector2D& B) { return Vector2D(A / B.x, A / B.y); }
 
 	Vector2D& operator += (Vector2D& A, const Vector2D& B) { A = A + B; return A; }
 	Vector2D& operator -= (Vector2D& A, const Vector2D& B) { A = A - B; return A; }
@@ -346,12 +350,12 @@ namespace ZCPP
 	// Multiply a Vector3D by a float
 	Vector3D operator * (const Vector3D& A, const float& B) { return Vector3D(A.x * B, A.y * B, A.z * B); }
 	// Multiply a Vector3D by a float
-	Vector3D operator * (const float& A, const Vector3D& B) { return(B * A); }
+	Vector3D operator * (const float& A, const Vector3D& B) { return Vector3D(A * B.x, A * B.y, A * B.z); }
 
 	// Divide a Vector3D by a float
 	Vector3D operator / (const Vector3D& A, const float& B) { return Vector3D(A.x / B, A.y / B, A.z / B); }
 	// Divide a Vector3D by a float
-	Vector3D operator / (const float& A, const Vector3D& B) { return (B / A); }
+	Vector3D operator / (const float& A, const Vector3D& B) { return Vector3D(A / B.x, A / B.y, A / B.z); }
 
 	Vector3D& operator += (Vector3D& A, const Vector3D& B) { A = A + B; return A; }
 	Vector3D& operator -= (Vector3D& A, const Vector3D& B) { A = A - B; return A; }
@@ -458,12 +462,12 @@ namespace ZCPP
 	// Multiply a Quaternion by a float (Scalar)
 	Quaternion operator * (const Quaternion& A, const float& B) { return Quaternion(A.x * B, A.y * B, A.z * B, A.w * B); }
 	// Multiply a Quaternion by a float (Scalar)
-	Quaternion operator * (const float& A, const Quaternion& B) { return B * A; }
+	Quaternion operator * (const float& A, const Quaternion& B) { return Quaternion(A * B.x, A * B.y, A * B.z, A * B.w); }
 
 	// Divide a Quaternion by a float (Scalar)
 	Quaternion operator / (const Quaternion& A, const float& B) { return Quaternion(A.x / B, A.y / B, A.z / B, A.w / B); }
 	// Divide a Quaternion by a float (Scalar)
-	Quaternion operator / (const float& A, const Quaternion& B) { return B / A; }
+	Quaternion operator / (const float& A, const Quaternion& B) { return Quaternion(A / B.x, A / B.y, A / B.z, A / B.w); }
 
 	Quaternion operator += (Quaternion& A, const Quaternion& B) { A = A + B;  return A; }
 	Quaternion operator -= (Quaternion& A, const Quaternion& B) { A = A - B;  return A; }
