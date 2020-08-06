@@ -17,8 +17,6 @@
 
 namespace ZCPP
 {
-#define INFINITE 1000000000
-
 	std::random_device device; std::mt19937 rng(device());
 	std::uniform_int_distribution<int32_t> rnd(-2147483647, 2147483647);
 
@@ -28,9 +26,11 @@ namespace ZCPP
 	const float e = 2.7182818284590452;
 
 	// Converting Degress to Radians
-	const float DegtoRad = Pi * 2. / 360.;
+	const float DegtoRad = Pi * 2.0f / 360.0f;
+	float DtoR(float Deg) { return Deg * DegtoRad; }
 	// Converting Radians to Degrees
-	const float RadtoDeg = 1. / DegtoRad;
+	const float RadtoDeg = 1.0f / DegtoRad;
+	float RtoD(float Rad) { return Rad * RadtoDeg; }
 
 	// Swap two values with eachother
 	template <typename Type> void Swap(Type& Val_A, Type& Val_B) { Type temp = Val_A; Val_A = Val_B; Val_B = temp; }
@@ -44,8 +44,14 @@ namespace ZCPP
 	template <typename Type> Type Abs(Type Value) { if (Value < 0) return -Value; return Value; }
 	// Returns the signed Value of Value
 	template <typename Type> Type Sign(Type Value) { if (Value < 0) return Value; return -Value; }
-	
-	//template <typename Type> Type CopySign(Type Value, Type Sign) { std::copysign(Value, Sign); }
+
+	// Copies the sign value of Sign and applies it to Value
+	template <typename Type> void CopySign(Type& Value, Type Sign) { bool Negative = Sign < 0; if (Value < 0 == Negative) return; Value = -Value; }
+
+	// returns float between -1 & 1
+	float GetDecimal(float Value) { return Value - int(Value); }
+	// returns double between -1 & 1
+	double GetDecimal(double Value) { return Value - int(Value); }
 
 	/* Int32 Random ( -2147483647, 2147483647 ) */
 	// Returns a random number between -2147483647, 2147483647 in int form
@@ -77,12 +83,12 @@ namespace ZCPP
 	}
 
 	// Returns bool if Value is a Whole number
-	bool IsWhole(float Value) { return ((Value - int(Value)) == 0); }
+	bool IsWhole(float Value) { return !GetDecimal(Value); }
 
 	// Value to the Nth power
 	float Pow(float Value, float Power) { return pow(Value, Power); }
 	// Value to the Nth root
-	float Root(float Value, float Root) { if (Root == 0) return INFINITE; return Pow(Value, 1 / Root); }
+	float Root(float Value, float Root) { if (!Root) return INFINITY; return Pow(Value, 1 / Root); }
 
 	// Quick square root
 	float Sqrt(float Value) { return sqrt(Value); }
@@ -90,10 +96,14 @@ namespace ZCPP
 	// Quick square power
 	float Sqr(float Value) { return (Value * Value); }
 
-	// Returns the greatest integer 
+	// Returns the base integer
+	int Trunc(float Value) { return int(Value); }
+	// Returns the nearest integer below Value
 	int Floor(float Value) { if (IsWhole(Value)) return Value; if (Value < 0) return int(Value) - 1; return int(Value); }
+	// Returns the nearest integer above Value
+	int Ceil(float Value) { if (IsWhole(Value)) return Value; if (Value < 0) return int(Value); return int(Value) + 1; }
 	// Rounds out Value if value decimal is greater than .5, round up, else round down
-	int Round(float Value) { if (IsWhole(Value)) return Value; if (Value < .5) return int(Value) + 1; else if (Value < -.5) return int(Value); return int(Value); }
+	int Round(float Value) { if (IsWhole(Value)) return Value; if (Value > 0) if (GetDecimal(Value) >= .5) return int(Value) + 1; if (Value < 0) if (GetDecimal(Value) <= -.5) return int(Value) - 1; return int(Value); }
 
 	// Modulator ( Gets the remainder after a "division" )
 	float Mod(float Value, float Modulator) { if (Value < Modulator) return Value; else while (Value >= Modulator) { Value -= Modulator; } return Value; }
