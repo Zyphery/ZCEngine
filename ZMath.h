@@ -140,6 +140,16 @@ namespace ZCPP
 	//template <typename Type> std::string ToString(Type Value) { return std::to_string(Value); }
 	// Converts the Value into a std::string with a set precision
 	template <typename Type> std::string ToString(const Type Value, const unsigned Precision = 6) { std::ostringstream out; out.precision(Precision); out << std::fixed << Value; return out.str(); }
+	std::string ToString(const bool Value) { if (Value) return "True"; return "False"; }
+	// Converts String into valuetype ( Do not use commas )
+	long double ToLongDouble(const std::string Value) { return std::stold(Value); }
+	long double ToLongDouble(const char* Value) { return ToLongDouble(std::string(Value)); }
+	double ToDouble(const std::string Value) { return std::stod(Value); }
+	double ToDouble(const char* Value) { return ToDouble(std::string(Value)); }
+	float ToFloat(const std::string Value) { return std::stof(Value); }
+	float ToFloat(const char* Value) { return ToFloat(std::string(Value)); }
+	int ToInt(const std::string Value) { return std::stoi(Value); }
+	int ToInt(const char* Value) { return ToInt(std::string(Value)); }
 
 	// Sorts an array [ Bubble sort ]
 	template <typename Type> void Sort(Type* Array, uint32_t size)
@@ -175,7 +185,7 @@ namespace ZCPP
 	{
 		// Console Log functions:
 		void Log(const char* c) { printf("%s\n", c); }
-		void Log(std::string s) { printf("%s\n", s.c_str()); }
+		void Log(std::string s) { Log(s.c_str()); }
 
 		void Log(bool b) { if (b) { Log("True"); return; } Log("False"); }
 		void Log(int i) { Log(ToString(i)); }
@@ -211,12 +221,14 @@ namespace ZCPP
 		Vector2D UnitVector() { return Normalize(*this); }
 		static Vector2D Rotate(Vector2D A, float r) { Vector2D V; V.x = A.x * Cos(r) - A.y * Sin(r); V.y = Sin(r) * A.x + Cos(r) * A.y; return V; }
 		void Rotate(float r) { *this = Rotate(*this, r); }
-		static Vector2D Random() { float r = Randomf(0, 360) * DegtoRad; return(Vector2D(Cos(r),Sin(r))); }
-
+		static Vector2D Random() { float r = Randomf(0, 360) * DegtoRad; return(Vector2D(Cos(r), Sin(r))); }
+		
 		// Converts A Vector2D into a std::string
 		static std::string ToString(Vector2D A) { return "<" + ZCPP::ToString(A.x) + ", " + ZCPP::ToString(A.y) + ">"; }
+		static std::string ToString(Vector2D A, uint8_t Precision) { return "<" + ZCPP::ToString(A.x, Precision) + ", " + ZCPP::ToString(A.y, Precision) + ">"; }
 		// Converts this Vector2D into a std::string
 		std::string ToString() { return ToString(*this); }
+		std::string ToString(uint8_t Precision) { return ToString(*this, Precision); }
 
 		// Returns the Max of all the x's, and y's
 		static Vector2D Max(Vector2D A, Vector2D B) { return Vector2D(ZCPP::Max(A.x, B.x), ZCPP::Max(A.y, B.y)); }
@@ -236,7 +248,7 @@ namespace ZCPP
 
 		Vector2D& operator += (const Vector2D& rhs) { this->x += rhs.x; this->y += rhs.y; return *this; }
 		Vector2D& operator -= (const Vector2D& rhs) { this->x -= rhs.x; this->y -= rhs.y; return *this; }
-		Vector2D& operator += (const float &rhs) { this->x += rhs; this->y += rhs; return *this; }
+		Vector2D& operator += (const float& rhs) { this->x += rhs; this->y += rhs; return *this; }
 		Vector2D& operator -= (const float& rhs) { this->x -= rhs; this->y -= rhs; return *this; }
 		Vector2D& operator *= (const Vector2D& rhs) { this->x *= rhs.x; this->y *= rhs.y; return *this; }
 		Vector2D& operator /= (const Vector2D& rhs) { this->x /= rhs.x; this->y /= rhs.y; return *this; }
@@ -252,8 +264,8 @@ namespace ZCPP
 	/* Comparison Operators */
 
 	bool operator == (const Vector2D& A, const Vector2D& B) { return (A.x == B.x && A.y == B.y); }
-	bool operator <  (const Vector2D& A, const Vector2D& B) { return (A.x <  B.x && A.y <  B.y); }
-	bool operator >  (const Vector2D& A, const Vector2D& B) { return (A.x >  B.x && A.y >  B.y); }
+	bool operator <  (const Vector2D& A, const Vector2D& B) { return (A.x < B.x&& A.y < B.y); }
+	bool operator >  (const Vector2D& A, const Vector2D& B) { return (A.x > B.x && A.y > B.y); }
 	bool operator <= (const Vector2D& A, const Vector2D& B) { return (A.x <= B.x && A.y <= B.y); }
 	bool operator >= (const Vector2D& A, const Vector2D& B) { return (A.x >= B.x && A.y >= B.y); }
 	bool operator != (const Vector2D& A, const Vector2D& B) { return (A.x != B.x && A.y != B.y); }
@@ -261,8 +273,8 @@ namespace ZCPP
 	// Comparing A Vector3D to a float is like comparing a Vector3D to a Vector3D with all the same values
 
 	bool operator == (const Vector2D& A, const float& B) { return (A.x == B && A.y == B); }
-	bool operator <  (const Vector2D& A, const float& B) { return (A.x <  B && A.y <  B); }
-	bool operator >  (const Vector2D& A, const float& B) { return (A.x >  B && A.y >  B); }
+	bool operator <  (const Vector2D& A, const float& B) { return (A.x < B&& A.y < B); }
+	bool operator >  (const Vector2D& A, const float& B) { return (A.x > B && A.y > B); }
 	bool operator <= (const Vector2D& A, const float& B) { return (A.x <= B && A.y <= B); }
 	bool operator >= (const Vector2D& A, const float& B) { return (A.x >= B && A.y >= B); }
 	bool operator != (const Vector2D& A, const float& B) { return (A.x != B && A.y != B); }
@@ -292,6 +304,7 @@ namespace ZCPP
 		Vector3D(Vector2D _V, float _z) : x(_V.x), y(_V.y), z(_z) {}
 
 		void operator = (const Vector3D& vec) { x = vec.x; y = vec.y; z = vec.z; }
+		void operator = (const Vector2D& vec) { x = vec.x; y = vec.y; }
 
 		/* Casting Vector3D to Vector2D
 		x, y, components are saved */
@@ -314,8 +327,10 @@ namespace ZCPP
 
 		// Converts A Vector2D into a std::string
 		static std::string ToString(Vector3D A) { return "<" + ZCPP::ToString(A.x) + ", " + ZCPP::ToString(A.y) + ", " + ZCPP::ToString(A.z) + ">"; }
+		static std::string ToString(Vector3D A, uint8_t Precision) { return "<" + ZCPP::ToString(A.x, Precision) + ", " + ZCPP::ToString(A.y, Precision) + ", " + ZCPP::ToString(A.z, Precision) + ">"; }
 		// Converts this Vector2D into a std::string
 		std::string ToString() { return ToString(*this); }
+		std::string ToString(uint8_t Precision) { return ToString(*this, Precision); }
 
 		// Returns the Max of all the x's, y's, and z's
 		static Vector3D Max(Vector3D A, Vector3D B) { return Vector3D(ZCPP::Max(A.x, B.x), ZCPP::Max(A.y, B.y), ZCPP::Max(A.z, B.z)); }
@@ -351,8 +366,8 @@ namespace ZCPP
 	/* Comparison Operators */
 
 	bool operator == (const Vector3D& A, const Vector3D& B) { return (A.x == B.x && A.y == B.y && A.z == B.z); }
-	bool operator <  (const Vector3D& A, const Vector3D& B) { return (A.x < B.x && A.y < B.y && A.z < B.z); }
-	bool operator >  (const Vector3D& A, const Vector3D& B) { return (A.x > B.x&& A.y > B.y&& A.z > B.z); }
+	bool operator <  (const Vector3D& A, const Vector3D& B) { return (A.x < B.x&& A.y < B.y&& A.z < B.z); }
+	bool operator >  (const Vector3D& A, const Vector3D& B) { return (A.x > B.x && A.y > B.y && A.z > B.z); }
 	bool operator <= (const Vector3D& A, const Vector3D& B) { return (A.x <= B.x && A.y <= B.y && A.x <= B.x); }
 	bool operator >= (const Vector3D& A, const Vector3D& B) { return (A.x >= B.x && A.y >= B.y && A.x >= B.x); }
 	bool operator != (const Vector3D& A, const Vector3D& B) { return (A.x != B.x && A.y != B.y && A.x != B.x); }
@@ -360,8 +375,8 @@ namespace ZCPP
 	// Comparing A Vector3D to a float is like comparing a Vector3D to a Vector3D with all the same values
 
 	bool operator == (const Vector3D& A, const float& B) { return (A.x == B && A.y == B && A.z == B); }
-	bool operator <  (const Vector3D& A, const float& B) { return (A.x < B && A.y < B && A.z < B); }
-	bool operator >  (const Vector3D& A, const float& B) { return (A.x > B&& A.y > B&& A.z > B); }
+	bool operator <  (const Vector3D& A, const float& B) { return (A.x < B&& A.y < B&& A.z < B); }
+	bool operator >  (const Vector3D& A, const float& B) { return (A.x > B && A.y > B && A.z > B); }
 	bool operator <= (const Vector3D& A, const float& B) { return (A.x <= B && A.y <= B && A.x <= B); }
 	bool operator >= (const Vector3D& A, const float& B) { return (A.x >= B && A.y >= B && A.x >= B); }
 	bool operator != (const Vector3D& A, const float& B) { return (A.x != B && A.y != B && A.x != B); }
@@ -417,8 +432,10 @@ namespace ZCPP
 
 		// Converts A Quaternion into a std::string
 		static std::string ToString(Quaternion A) { return "<" + ZCPP::ToString(A.x) + ", " + ZCPP::ToString(A.y) + ", " + ZCPP::ToString(A.z) + ", " + ZCPP::ToString(A.w) + ">"; }
+		static std::string ToString(Quaternion A, uint8_t Precision) { return "<" + ZCPP::ToString(A.x, Precision) + ", " + ZCPP::ToString(A.y, Precision) + ", " + ZCPP::ToString(A.z, Precision) + ", " + ZCPP::ToString(A.w, Precision) + ">"; }
 		// Converts this Quaternion into a std::string
 		std::string ToString() { return ToString(*this); }
+		std::string ToString(uint8_t Precision) { return ToString(*this, Precision); }
 
 		// Returns the Max of all the w's, x's, y's, and z's
 		static Quaternion Max(Quaternion A, Quaternion B) { return Quaternion(ZCPP::Max(A.x, B.x), ZCPP::Max(A.y, B.y), ZCPP::Max(A.z, B.z), ZCPP::Max(A.w, B.w)); }
@@ -454,8 +471,8 @@ namespace ZCPP
 	/* Comparison Operators */
 
 	bool operator == (const Quaternion& A, const Quaternion& B) { return (A.x == B.x && A.y == B.y && A.z == B.z && A.w == B.w); }
-	bool operator <  (const Quaternion& A, const Quaternion& B) { return (A.x < B.x && A.y < B.y && A.z < B.z && A.w < B.w); }
-	bool operator >  (const Quaternion& A, const Quaternion& B) { return (A.x > B.x&& A.y > B.y&& A.z > B.z&& A.w > B.w); }
+	bool operator <  (const Quaternion& A, const Quaternion& B) { return (A.x < B.x&& A.y < B.y&& A.z < B.z&& A.w < B.w); }
+	bool operator >  (const Quaternion& A, const Quaternion& B) { return (A.x > B.x && A.y > B.y && A.z > B.z && A.w > B.w); }
 	bool operator <= (const Quaternion& A, const Quaternion& B) { return (A.x <= B.x && A.y <= B.y && A.x <= B.x && A.w <= B.w); }
 	bool operator >= (const Quaternion& A, const Quaternion& B) { return (A.x >= B.x && A.y >= B.y && A.x >= B.x && A.w >= B.w); }
 	bool operator != (const Quaternion& A, const Quaternion& B) { return (A.x != B.x && A.y != B.y && A.x != B.x && A.w != B.w); }
@@ -463,8 +480,8 @@ namespace ZCPP
 	// Comparing A Vector3D to a float is like comparing a Vector3D to a Vector3D with all the same values
 
 	bool operator == (const Quaternion& A, const float& B) { return (A.x == B && A.y == B && A.z == B && A.w == B); }
-	bool operator <  (const Quaternion& A, const float& B) { return (A.x < B && A.y < B && A.z < B && A.w < B); }
-	bool operator >  (const Quaternion& A, const float& B) { return (A.x > B&& A.y > B&& A.z > B&& A.w > B); }
+	bool operator <  (const Quaternion& A, const float& B) { return (A.x < B&& A.y < B&& A.z < B&& A.w < B); }
+	bool operator >  (const Quaternion& A, const float& B) { return (A.x > B && A.y > B && A.z > B && A.w > B); }
 	bool operator <= (const Quaternion& A, const float& B) { return (A.x <= B && A.y <= B && A.x <= B && A.w <= B); }
 	bool operator >= (const Quaternion& A, const float& B) { return (A.x >= B && A.y >= B && A.x >= B && A.w >= B); }
 	bool operator != (const Quaternion& A, const float& B) { return (A.x != B && A.y != B && A.x != B && A.w != B); }
