@@ -36,6 +36,9 @@ namespace ZCPP
 	// Swap two values with eachother
 	template <typename Type> void Swap(Type& Val_A, Type& Val_B) { Type temp = Val_A; Val_A = Val_B; Val_B = temp; }
 
+	// Clamps any type of Value between min and max
+	template <typename Type> Type Clamp(Type min, Type max, Type Value) { if (max < min) Swap(min, max); if (Value < min) return min; else if (Value > max) return max; else return Value; }
+
 	// Returns the Min of the two, doesn't account if they are equal
 	template <typename Type> Type Min(Type Val_A, Type Val_B) { if (Val_A < Val_B) return Val_A; return Val_B; }
 	// Returns the Max of the two, doesn't account if they are equal
@@ -105,8 +108,10 @@ namespace ZCPP
 	// Rounds out Value if value decimal is greater than .5, round up, else round down
 	int Round(float Value) { if (IsWhole(Value)) return Value; if (Value > 0) if (GetDecimal(Value) >= .5) return int(Value) + 1; if (Value < 0) if (GetDecimal(Value) <= -.5) return int(Value) - 1; return int(Value); }
 
-	// Modulates the value
-	float Mod(float Value, float Modulator) { return fmod(Value, Modulator); }
+	// Normal modulous function
+	float Mod(float Value, float Modulator) { return Value - Floor(Value / Modulator) * Modulator; }
+	// Modulates the using fmod
+	float Mod2(float Value, float Modulator) { return fmod(Value, Modulator); }
 
 	// Factorial cannot go higher than 65
 	uint64_t Fac(unsigned short int iter) { uint64_t fac = 1; for (int i = 1; i <= iter && i < 66; i++) fac *= i; return fac; }
@@ -124,17 +129,21 @@ namespace ZCPP
 	// Logarithmic function to base 10
 	float Log10(float Value) { return log10f(Value); }
 
-	// Get percentage of where value is between min and max
-	float PercentagefromValue(float min, float max, float value) { return (value - min) / (max - min); }
-	// Get value from percentage between min and max
-	float PercentagetoValue(float min, float max, float percentage) { return max * percentage + min; }
+	// Get percentage of where Value is between Val_A and Val_B
+	float InvLinearInterpolate(float Val_A, float Val_B, float Value) { return (Value - Val_A) / (Val_B - Val_A); }
+	// Linear interpolate between Val_A and Val_B using percentage Value
+	float LinearInterpolate(float Val_A, float Val_B, float Value) { return Val_A + (Val_B - Val_A) * Value; }
 
+	// Bounces when Value equals length
+	float PingPong(float Value, float length = 1) { Value = Clamp(0.0f, length * 2, Value - Floor(Value / (length * 2)) * (length * 2)); return length - Abs(Value - length); }
 
-	// Clamps any type of Value between min and max
-	template <typename Type> Type Clamp(Type min, Type max, Type Value) { if (max < min) Swap(min, max); if (Value < min) return min; else if (Value > max) return max; else return Value; }
+	// Smoothly interpolates from Val_A to Val_B with Value
+	float SmoothStep(float Val_A, float Val_B, float Value) { //t = Clamp(0.f, 1.f, Value);
+		Value = -2.f * Value * Value * Value + 3.f * Value * Value; return Val_B * Value + Val_A * (1.f - Value);
+	}
 
 	// Maps values from in-min and in-max to out-min and out-max
-	template <typename Type> Type Map(Type inMin, Type inMax, Type outMin, Type outMax, Type Value) { /*if (inMax < inMin) Swap(inMin, inMax); if (outMax < outMin) Swap(outMin, outMax);*/ return (Type)PercentagetoValue(outMin, outMax, PercentagefromValue(inMin, inMax, Value)); }
+	template <typename Type> Type Map(Type inMin, Type inMax, Type outMin, Type outMax, Type Value) { /*if (inMax < inMin) Swap(inMin, inMax); if (outMax < outMin) Swap(outMin, outMax);*/ return (Type)LinearInterpolate(outMin, outMax, InvLinearInterpolate(inMin, inMax, Value)); }
 
 	// Converts the Value into a std::string
 	//template <typename Type> std::string ToString(Type Value) { return std::to_string(Value); }
@@ -217,12 +226,12 @@ namespace ZCPP
 		static Vector2D Normalize(Vector2D A) { float L = 1 / Length(A); return Vector2D(A.x * L, A.y * L); }
 		void Normalize() { *this = Normalize(*this); }
 		static Vector2D Abs(Vector2D A) { return Vector2D(ZCPP::Abs(A.x), ZCPP::Abs(A.y)); }
-		void Abs() { *this = Abs(*this); }
+		Vector2D Abs() { return Abs(*this); }
 		Vector2D UnitVector() { return Normalize(*this); }
 		static Vector2D Rotate(Vector2D A, float r) { Vector2D V; V.x = A.x * Cos(r) - A.y * Sin(r); V.y = Sin(r) * A.x + Cos(r) * A.y; return V; }
-		void Rotate(float r) { *this = Rotate(*this, r); }
+		Vector2D Rotate(float r) { return Rotate(*this, r); }
 		static Vector2D Random() { float r = Randomf(0, 360) * DegtoRad; return(Vector2D(Cos(r), Sin(r))); }
-		
+
 		// Converts A Vector2D into a std::string
 		static std::string ToString(Vector2D A) { return "<" + ZCPP::ToString(A.x) + ", " + ZCPP::ToString(A.y) + ">"; }
 		static std::string ToString(Vector2D A, uint8_t Precision) { return "<" + ZCPP::ToString(A.x, Precision) + ", " + ZCPP::ToString(A.y, Precision) + ">"; }
@@ -290,6 +299,44 @@ namespace ZCPP
 	// Angle in radians between two Vector2D
 	float Angle(Vector2D A, Vector2D B) { if (A < B) Swap(A, B); return 2 * Abs(atan2(B.x - A.x, B.y - A.y)); }
 
+	// Find the closest point to Circle A with radius r from point P
+	Vector2D PointToCircle(Vector2D P, Vector2D A, float r)
+	{
+		// Circle A, radius r // Point P
+		return Vector2D::Distance(P, A) - r; // Returns negative if P is inside the radius
+	}
+
+	//// Find the closest point to Rectangle A (center) with size B from point P
+	//Vector2D PointToRectangle(Vector2D P, Vector2D A, Vector2D B)
+	//{
+	//	// Rectangle A with size B // Point P
+	//	Vector2D offset = (P - A).Abs() - B;
+	//	float udist = Vector2D::Max(offset, 0).Length();
+	//	float idist = 0;// Vector2D::Max(Vector2D::Min(offset, 0));
+	//	return udist + idist;
+
+	//}
+
+	// Find the closest point to line segment AB with point P
+	Vector2D PointToLineSegment(Vector2D P, Vector2D A, Vector2D B) {
+		// Line AB // Point P
+		float m = (B.y - A.y) / (B.x - A.x); // Slope
+		float b = A.y - m * A.x; // Y - interscept 
+		Vector2D D = (Vector2D((2 * (m * (P.y - b) + P.x)) / (m * m + 1) - P.x, 2 * (m * (m * (P.y - b) + P.x)) / (m * m + 1) + 2 * b - P.y) + P) / 2; // Point reflected along the Line
+		float t = InvLinearInterpolate(A.x, B.x, D.x); // Where the closest point is on the line
+		t = Clamp(0.f, 1.f, t); // Clamp the point on the line between both points to make it a line segment
+		return Vector2D(LinearInterpolate(A.x, B.x, t), LinearInterpolate(A.y, B.y, t));
+	}
+
+	// Find the closest point to line AB with point P (infinite)
+	Vector2D PointToLine(Vector2D P, Vector2D A, Vector2D B) {
+		// Line AB // Point P
+		float m = (B.y - A.y) / (B.x - A.x); // Slope
+		float b = A.y - m * A.x; // Y - interscept 
+		return (Vector2D((2 * (m * (P.y - b) + P.x)) / (m * m + 1) - P.x, 2 * (m * (m * (P.y - b) + P.x)) / (m * m + 1) + 2 * b - P.y) + P) / 2;
+	}
+
+
 
 
 	class Vector3D // Vector3D class ( X, Y, Z )
@@ -322,7 +369,7 @@ namespace ZCPP
 		void Normalize() { *this = Normalize(*this); }
 		Vector3D UnitVector() { return Normalize(*this); }
 		static Vector3D Abs(Vector3D A) { return Vector3D(ZCPP::Abs(A.x), ZCPP::Abs(A.y), ZCPP::Abs(A.z)); }
-		void Abs() { *this = Abs(*this); }
+		Vector3D Abs() { return Abs(*this); }
 		static Vector3D Random() { return Normalize(Vector3D(rnd(rng), rnd(rng), rnd(rng))); }
 
 		// Converts A Vector2D into a std::string
@@ -427,7 +474,7 @@ namespace ZCPP
 		void Normalize() { *this = Normalize(*this); }
 		Quaternion UnitQuaternion() { return Normalize(*this); }
 		static Quaternion Abs(Quaternion A) { return Quaternion(ZCPP::Abs(A.x), ZCPP::Abs(A.y), ZCPP::Abs(A.z), ZCPP::Abs(A.w)); }
-		void Abs() { *this = Abs(*this); }
+		Quaternion Abs() { return Abs(*this); }
 		static Quaternion Random() { return Normalize(Quaternion(rnd(rng), rnd(rng), rnd(rng), rnd(rng))); }
 
 		// Converts A Quaternion into a std::string
