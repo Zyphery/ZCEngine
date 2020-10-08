@@ -79,11 +79,11 @@ namespace ZCPP
 	/* float Random ( -1, 1 ) */
 	// 50 decimal point precision
 	// Returns a random number between -1 and 1 in float form
-	float Randomd() { std::uniform_real_distribution<float> nrnd(-1, 1); return nrnd(rng); }
+	double Randomd() { std::uniform_real_distribution<double> nrnd(-1, 1); return nrnd(rng); }
 	// Returns a random number between the min and max in float form
-	float Randomd(float min, float max) {
+	double Randomd(double min, double max) {
 		if (max < min) Swap(min, max); if (min == max) return max;
-		std::uniform_real_distribution<float> nrnd(min, max); return nrnd(rng);
+		std::uniform_real_distribution<double> nrnd(min, max); return nrnd(rng);
 	}
 
 	// Returns bool if Value is a Whole number
