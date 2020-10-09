@@ -145,12 +145,12 @@ namespace ZCPP
 	// Maps values from in-min and in-max to out-min and out-max
 	template <typename Type> Type Map(Type inMin, Type inMax, Type outMin, Type outMax, Type Value) { /*if (inMax < inMin) Swap(inMin, inMax); if (outMax < outMin) Swap(outMin, outMax);*/ return (Type)LinearInterpolate(outMin, outMax, InvLinearInterpolate(inMin, inMax, Value)); }
 
-	// Converts the Value into a std::string
-	//template <typename Type> std::string ToString(Type Value) { return std::to_string(Value); }
 	// Converts the Value into a std::string with a set precision
 	template <typename Type> std::string ToString(const Type Value, const unsigned Precision = 6) { std::ostringstream out; out.precision(Precision); out << std::fixed << Value; return out.str(); }
 	std::string ToString(const bool Value) { if (Value) return "True"; return "False"; }
+
 	// Converts String into valuetype ( Do not use commas )
+
 	long double ToLongDouble(const std::string Value) { return std::stold(Value); }
 	long double ToLongDouble(const char* Value) { return ToLongDouble(std::string(Value)); }
 	double ToDouble(const std::string Value) { return std::stod(Value); }
@@ -233,11 +233,9 @@ namespace ZCPP
 		static Vector2D Random() { float r = Randomf(0, 360) * DegtoRad; return(Vector2D(Cos(r), Sin(r))); }
 
 		// Converts A Vector2D into a std::string
-		static std::string ToString(Vector2D A) { return "<" + ZCPP::ToString(A.x) + ", " + ZCPP::ToString(A.y) + ">"; }
-		static std::string ToString(Vector2D A, uint8_t Precision) { return "<" + ZCPP::ToString(A.x, Precision) + ", " + ZCPP::ToString(A.y, Precision) + ">"; }
+		static std::string ToString(Vector2D A, const unsigned Precision = 6) { return "<" + ZCPP::ToString(A.x, Precision) + ", " + ZCPP::ToString(A.y, Precision) + ">"; }
 		// Converts this Vector2D into a std::string
-		std::string ToString() { return ToString(*this); }
-		std::string ToString(uint8_t Precision) { return ToString(*this, Precision); }
+		std::string ToString(const unsigned Precision = 6) { return ToString(*this, Precision); }
 
 		// Returns the Max of all the x's, and y's
 		static Vector2D Max(Vector2D A, Vector2D B) { return Vector2D(ZCPP::Max(A.x, B.x), ZCPP::Max(A.y, B.y)); }
@@ -373,11 +371,9 @@ namespace ZCPP
 		static Vector3D Random() { return Normalize(Vector3D(rnd(rng), rnd(rng), rnd(rng))); }
 
 		// Converts A Vector2D into a std::string
-		static std::string ToString(Vector3D A) { return "<" + ZCPP::ToString(A.x) + ", " + ZCPP::ToString(A.y) + ", " + ZCPP::ToString(A.z) + ">"; }
-		static std::string ToString(Vector3D A, uint8_t Precision) { return "<" + ZCPP::ToString(A.x, Precision) + ", " + ZCPP::ToString(A.y, Precision) + ", " + ZCPP::ToString(A.z, Precision) + ">"; }
+		static std::string ToString(Vector3D A, const unsigned Precision = 6) { return "<" + ZCPP::ToString(A.x, Precision) + ", " + ZCPP::ToString(A.y, Precision) + ", " + ZCPP::ToString(A.z, Precision) + ">"; }
 		// Converts this Vector2D into a std::string
-		std::string ToString() { return ToString(*this); }
-		std::string ToString(uint8_t Precision) { return ToString(*this, Precision); }
+		std::string ToString(const unsigned Precision = 6) { return ToString(*this, Precision); }
 
 		// Returns the Max of all the x's, y's, and z's
 		static Vector3D Max(Vector3D A, Vector3D B) { return Vector3D(ZCPP::Max(A.x, B.x), ZCPP::Max(A.y, B.y), ZCPP::Max(A.z, B.z)); }
@@ -478,11 +474,9 @@ namespace ZCPP
 		static Quaternion Random() { return Normalize(Quaternion(rnd(rng), rnd(rng), rnd(rng), rnd(rng))); }
 
 		// Converts A Quaternion into a std::string
-		static std::string ToString(Quaternion A) { return "<" + ZCPP::ToString(A.x) + ", " + ZCPP::ToString(A.y) + ", " + ZCPP::ToString(A.z) + ", " + ZCPP::ToString(A.w) + ">"; }
-		static std::string ToString(Quaternion A, uint8_t Precision) { return "<" + ZCPP::ToString(A.x, Precision) + ", " + ZCPP::ToString(A.y, Precision) + ", " + ZCPP::ToString(A.z, Precision) + ", " + ZCPP::ToString(A.w, Precision) + ">"; }
+		static std::string ToString(Quaternion A, const unsigned Precision = 6) { return "<" + ZCPP::ToString(A.x, Precision) + ", " + ZCPP::ToString(A.y, Precision) + ", " + ZCPP::ToString(A.z, Precision) + ", " + ZCPP::ToString(A.w, Precision) + ">"; }
 		// Converts this Quaternion into a std::string
-		std::string ToString() { return ToString(*this); }
-		std::string ToString(uint8_t Precision) { return ToString(*this, Precision); }
+		std::string ToString(const unsigned Precision = 6) { return ToString(*this, Precision); }
 
 		// Returns the Max of all the w's, x's, y's, and z's
 		static Quaternion Max(Quaternion A, Quaternion B) { return Quaternion(ZCPP::Max(A.x, B.x), ZCPP::Max(A.y, B.y), ZCPP::Max(A.z, B.z), ZCPP::Max(A.w, B.w)); }
@@ -619,6 +613,13 @@ namespace ZCPP
 		return VectorP;
 	}
 
+	namespace ZLog
+	{
+		void Log(Vector2D v, const unsigned Precision = 6) { ZLog::Log(v.ToString(Precision)); }
+		void Log(Vector3D v, const unsigned Precision = 6) { ZLog::Log(v.ToString(Precision)); }
+		void Log(Quaternion q, const unsigned Precision = 6) { ZLog::Log(q.ToString(Precision)); }
+	}
+
 
 	/* Just some personal notes:
 	If w == 1, then the vector (x,y,z,1) is a position in space.
@@ -635,8 +636,8 @@ namespace ZCPP
 
 		static Matrix3 Identity() { Matrix3 M;  M.M[0][0] = 1; M.M[1][1] = 1; M.M[2][2] = 1; return M; }
 
-		static std::string ToString(Matrix3 A) { return "< 0: " + ZCPP::ToString(A.M[0][0]) + ", " + ZCPP::ToString(A.M[0][1]) + ", " + ZCPP::ToString(A.M[0][2]) + " 1: " + ZCPP::ToString(A.M[1][0]) + ", " + ZCPP::ToString(A.M[1][1]) + ", " + ZCPP::ToString(A.M[1][2]) + " 2: " + ZCPP::ToString(A.M[2][0]) + ", " + ZCPP::ToString(A.M[2][1]) + ", " + ZCPP::ToString(A.M[2][2]) + " >"; }
-		std::string ToString() { return ToString(*this); }
+		static std::string ToString(Matrix3 A, const unsigned Precision = 6) { return "< 0: " + ZCPP::ToString(A.M[0][0], Precision) + ", " + ZCPP::ToString(A.M[0][1], Precision) + ", " + ZCPP::ToString(A.M[0][2], Precision) + "  1: " + ZCPP::ToString(A.M[1][0], Precision) + ", " + ZCPP::ToString(A.M[1][1], Precision) + ", " + ZCPP::ToString(A.M[1][2], Precision) + "  2: " + ZCPP::ToString(A.M[2][0], Precision) + ", " + ZCPP::ToString(A.M[2][1], Precision) + ", " + ZCPP::ToString(A.M[2][2], Precision) + " >"; }
+		std::string ToString(const unsigned Precision = 6) { return ToString(*this, Precision); }
 
 		// Non-real functions
 		// Add two 3x3 Matricies
@@ -782,8 +783,8 @@ namespace ZCPP
 
 		static Matrix4 Identity() { Matrix4 M;  M.M[0][0] = 1; M.M[1][1] = 1; M.M[2][2] = 1; M.M[3][3] = 1; return M; }
 
-		static std::string ToString(Matrix4 A) { return "< 0: " + ZCPP::ToString(A.M[0][0]) + ", " + ZCPP::ToString(A.M[0][1]) + ", " + ZCPP::ToString(A.M[0][2]) + ", " + ZCPP::ToString(A.M[0][3]) + "   1: " + ZCPP::ToString(A.M[1][0]) + ", " + ZCPP::ToString(A.M[1][1]) + ", " + ZCPP::ToString(A.M[1][2]) + ", " + ZCPP::ToString(A.M[1][3]) + "   2: " + ZCPP::ToString(A.M[2][0]) + ", " + ZCPP::ToString(A.M[2][1]) + ", " + ZCPP::ToString(A.M[2][2]) + ", " + ZCPP::ToString(A.M[2][3]) + " 3: " + ZCPP::ToString(A.M[3][0]) + ", " + ZCPP::ToString(A.M[3][1]) + ", " + ZCPP::ToString(A.M[3][2]) + ", " + ZCPP::ToString(A.M[3][3]) + " >"; }
-		std::string ToString() { return ToString(*this); }
+		static std::string ToString(Matrix4 A, const unsigned Precision = 6) { return "< 0: " + ZCPP::ToString(A.M[0][0], Precision) + ", " + ZCPP::ToString(A.M[0][1], Precision) + ", " + ZCPP::ToString(A.M[0][2], Precision) + ", " + ZCPP::ToString(A.M[0][3], Precision) + "  1: " + ZCPP::ToString(A.M[1][0], Precision) + ", " + ZCPP::ToString(A.M[1][1], Precision) + ", " + ZCPP::ToString(A.M[1][2], Precision) + ", " + ZCPP::ToString(A.M[1][3], Precision) + "  2: " + ZCPP::ToString(A.M[2][0], Precision) + ", " + ZCPP::ToString(A.M[2][1], Precision) + ", " + ZCPP::ToString(A.M[2][2], Precision) + ", " + ZCPP::ToString(A.M[2][3], Precision) + "  3: " + ZCPP::ToString(A.M[3][0], Precision) + ", " + ZCPP::ToString(A.M[3][1], Precision) + ", " + ZCPP::ToString(A.M[3][2], Precision) + ", " + ZCPP::ToString(A.M[3][3], Precision) + " >"; }
+		std::string ToString(const unsigned Precision = 6) { return ToString(*this, Precision); }
 
 		// Non-real functions
 		// Add two 4x4 Matricies
@@ -1015,4 +1016,27 @@ namespace ZCPP
 	Quaternion operator *= (Vector3D& A, const Matrix4& B) { return Matrix4::Multiply(B, A); }
 	Quaternion operator /= (Quaternion& A, const Matrix4& B) { A = A / B; return A; }
 	Quaternion operator /= (Vector3D& A, const Matrix4& B) { return Matrix4::Divide(B, A); }
+
+	namespace ZLog
+	{
+		void Log(Matrix3 m, const unsigned Precision = 6) { Log(m.ToString(Precision)); }
+		void Log(Matrix4 m, const unsigned Precision = 6) { Log(m.ToString(Precision)); }
+
+		void Log(Vector2D* Array, int size = 1, const unsigned Precision = 6) { std::string a; for (int i = 0; i < size; i++) { a += Array[i].ToString(Precision); if (i < size - 1) a += ", "; } Log(a); }
+		void Log(Vector3D* Array, int size = 1, const unsigned Precision = 6) { std::string a; for (int i = 0; i < size; i++) { a += Array[i].ToString(Precision); if (i < size - 1) a += ", "; } Log(a); }
+		void Log(Quaternion* Array, int size = 1, const unsigned Precision = 6) { std::string a; for (int i = 0; i < size; i++) { a += Array[i].ToString(Precision); if (i < size - 1) a += ", "; } Log(a); }
+
+
+		void Log(Matrix3* Array, int size = 1, const unsigned Precision = 6) { std::string a; for (int i = 0; i < size; i++) { a += Array[i].ToString(Precision); if (i < size - 1) a += ", "; } Log(a); }
+		void Log(Matrix4* Array, int size = 1, const unsigned Precision = 6) { std::string a; for (int i = 0; i < size; i++) { a += Array[i].ToString(Precision); if (i < size - 1) a += ", "; } Log(a); }
+		template <typename Type> void Log(Type* Array, int size = 1, const unsigned Precision = 6) { std::string a; for (int i = 0; i < size; i++) { a += ToString(Array[i], Precision); if (i < size - 1) a += ", "; } Log(a); }
+
+		void Log(std::vector<Vector2D> Array, const unsigned Precision = 6) { Log(Array.data(), Array.size(), Precision); }
+		void Log(std::vector<Vector3D> Array, const unsigned Precision = 6) { Log(Array.data(), Array.size(), Precision); }
+		void Log(std::vector<Quaternion> Array, const unsigned Precision = 6) { Log(Array.data(), Array.size(), Precision); }
+
+		void Log(std::vector<Matrix3> Array, const unsigned Precision = 6) { Log(Array.data(), Array.size(), Precision); }
+		void Log(std::vector<Matrix4> Array, const unsigned Precision = 6) { Log(Array.data(), Array.size(), Precision); }
+		template <typename Type> void Log(std::vector<Type> Array, const unsigned Precision = 6) { Log(&Array, Array.size(), Precision); }
+	}
 };
