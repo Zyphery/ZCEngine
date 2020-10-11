@@ -301,7 +301,7 @@ namespace ZCPP
 	Vector2D PointToCircle(Vector2D P, Vector2D A, float r)
 	{
 		// Circle A, radius r // Point P
-		return Vector2D::Distance(P, A) - r; // Returns negative if P is inside the radius
+		return (P-A).UnitVector() * r + A;
 	}
 
 	//// Find the closest point to Rectangle A (center) with size B from point P
