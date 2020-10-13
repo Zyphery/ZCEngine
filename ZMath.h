@@ -301,19 +301,83 @@ namespace ZCPP
 	Vector2D PointToCircle(Vector2D P, Vector2D A, float r)
 	{
 		// Circle A, radius r // Point P
-		return (P-A).UnitVector() * r + A;
+		float d = Vector2D::Distance(P, A);
+		return Vector2D(A.x + r * (P.x - A.x) / d, A.y + r * (P.y - A.y) / d);
 	}
 
-	//// Find the closest point to Rectangle A (center) with size B from point P
-	//Vector2D PointToRectangle(Vector2D P, Vector2D A, Vector2D B)
-	//{
-	//	// Rectangle A with size B // Point P
-	//	Vector2D offset = (P - A).Abs() - B;
-	//	float udist = Vector2D::Max(offset, 0).Length();
-	//	float idist = 0;// Vector2D::Max(Vector2D::Min(offset, 0));
-	//	return udist + idist;
+	// Find the closest point to Circle A with radius r from point P
+	Vector2D OppositePointToCircle(Vector2D P, Vector2D A, float r)
+	{
+		// Circle A, radius r // Point P
+		float d = Vector2D::Distance(P, A);
+		return Vector2D(A.x - r * (P.x - A.x) / d, A.y - r * (P.y - A.y) / d);
+	}
 
-	//}
+	// Find the two points that are the intersections of two circles, returns C, D
+	void CircleThroughCircle(Vector2D A, float r1, Vector2D B, float r2, Vector2D& C, Vector2D& D)
+	{
+		float d = Vector2D::Distance(A, B);
+		if (d > r1 + r2) { C = NAN; D = NAN; return; }
+		if (d < Abs(r1 - r2)) { C = NAN; D = NAN; return; }
+		if (d == 0 && r1 == r2) { C = NAN; D = NAN; return; }
+
+		float a = (Sqr(r1) - Sqr(r2) + Sqr(d)) / (2 * d);
+		float h = Sqrt(Sqr(r1) - Sqr(a));
+
+		Vector2D c = A + a * (B - A) / d;
+
+		C.x = c.x + h * (B.y - A.y) / d;
+		C.y = c.y - h * (B.x - A.x) / d;
+		D.x = c.x - h * (B.y - A.y) / d;
+		D.y = c.y + h * (B.x - A.x) / d;
+	}
+
+	// Find two points that Line L1-L2 passes through Circle C, with radius r, returns A, B
+	void LineThroughCircle(Vector2D L1, Vector2D L2, Vector2D C, float r, Vector2D& A, Vector2D& B)
+	{
+		auto sgn = [&](float x) {
+			if (x < 0) return -1;
+			return 1;
+		};
+
+		L1 -= C;
+		L2 -= C;
+
+		Vector2D d = Vector2D(L2.x-L1.x, L2.y-L1.y);
+		float dr = Sqrt(Sqr(d.x) + Sqr(d.y));//Vector2D::Length(d);
+		float D = L1.x * L2.y - L2.x * L1.y;
+
+		A.x = (D * d.y + sgn(d.y) * d.x * Sqrt(Sqr(r) * Sqr(dr) - Sqr(D))) / Sqr(dr) + C.x;
+		B.x = (D * d.y - sgn(d.y) * d.x * Sqrt(Sqr(r) * Sqr(dr) - Sqr(D))) / Sqr(dr) + C.x;
+		A.y = (-D * d.x + Abs(d.y) * Sqrt(Sqr(r) * Sqr(dr) - Sqr(D))) / Sqr(dr) + C.y;
+		B.y = (-D * d.x - Abs(d.y) * Sqrt(Sqr(r) * Sqr(dr) - Sqr(D))) / Sqr(dr) + C.y;
+	}
+
+	// Find two points that Line Segment L1-L2 passes through Circle C, with radius r, returns A, B
+	void LineSegmentThroughCircle(Vector2D L1, Vector2D L2, Vector2D C, float r, Vector2D& A, Vector2D& B)
+	{
+		auto sgn = [&](float x) { if (x < 0) return -1; return 1; };
+
+		L1 -= C; L2 -= C;
+
+		Vector2D d = Vector2D(L2.x - L1.x, L2.y - L1.y);
+		float dr = Sqrt(Sqr(d.x) + Sqr(d.y));//Vector2D::Length(d);
+		float D = L1.x * L2.y - L2.x * L1.y;
+
+		A.x = (D * d.y + sgn(d.y) * d.x * Sqrt(Sqr(r) * Sqr(dr) - Sqr(D))) / Sqr(dr) + C.x;
+		float t = InvLinearInterpolate(L1.x, L2.x, A.x-C.x);
+		if (t >= 0 && t <= 1)
+			A.y = (-D * d.x + Abs(d.y) * Sqrt(Sqr(r) * Sqr(dr) - Sqr(D))) / Sqr(dr) + C.y;
+		else
+			A = NAN;
+
+		B.x = (D * d.y - sgn(d.y) * d.x * Sqrt(Sqr(r) * Sqr(dr) - Sqr(D))) / Sqr(dr) + C.x;
+		t = InvLinearInterpolate(L1.x, L2.x, B.x-C.x);
+		if (t >= 0 && t <= 1)
+			B.y = (-D * d.x - Abs(d.y) * Sqrt(Sqr(r) * Sqr(dr) - Sqr(D))) / Sqr(dr) + C.y;
+		else
+			B = NAN;
+	}
 
 	// Find the closest point to line segment AB with point P
 	Vector2D PointToLineSegment(Vector2D P, Vector2D A, Vector2D B) {
@@ -332,6 +396,24 @@ namespace ZCPP
 		float m = (B.y - A.y) / (B.x - A.x); // Slope
 		float b = A.y - m * A.x; // Y - interscept 
 		return (Vector2D((2 * (m * (P.y - b) + P.x)) / (m * m + 1) - P.x, 2 * (m * (m * (P.y - b) + P.x)) / (m * m + 1) + 2 * b - P.y) + P) / 2;
+	}
+
+	// Find the point of intersection between Line AB and Line CD (infinite)
+	Vector2D LineToLine(Vector2D A, Vector2D B, Vector2D C, Vector2D D)
+	{
+		return Vector2D(((A.x * B.y - A.y * B.x) * (C.x - D.x) - (A.x - B.x) * (C.x * D.y - C.y * D.x)) / ((A.x - B.x) * (C.y - D.y) - (A.y - B.y) * (C.x - D.x)), ((A.x * B.y - A.y * B.x) * (C.y - D.y) - (A.y - B.y) * (C.x * D.y - C.y * D.x)) / ((A.x - B.x) * (C.y - D.y) - (A.y - B.y) * (C.x - D.x)));
+	}
+
+	// Find the point of intersection between Line segment AB and Line segment CD
+	Vector2D LineSegmentToLineSegment(Vector2D A, Vector2D B, Vector2D C, Vector2D D)
+	{
+		float t = ((A.x - C.x) * (C.y - D.y) - (A.y - C.y) * (C.x - D.x)) / ((A.x - B.x) * (C.y - D.y) - (A.y - B.y) * (C.x - D.x));
+		float u = -((A.x - B.x) * (A.y - C.y) - (A.y - B.y) * (A.x - C.x)) / ((A.x - B.x) * (C.y - D.y) - (A.y - B.y) * (C.x - D.x));
+		if (t >= 0 && t <= 1 && u >= 0 && u <= 1)
+		{
+			return Vector2D(LinearInterpolate(A.x, B.x, t), LinearInterpolate(A.y, B.y, t));
+		}
+		return NAN;
 	}
 
 
