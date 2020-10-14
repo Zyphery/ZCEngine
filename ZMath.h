@@ -382,6 +382,17 @@ namespace ZCPP
 	// Find the closest point to line segment AB with point P
 	Vector2D PointToLineSegment(Vector2D P, Vector2D A, Vector2D B) {
 		// Line AB // Point P
+		if (B.x - A.x == 0)
+		{
+			float t = InvLinearInterpolate(A.y, B.y, P.y);
+			if(t >= 0 && t <=  1)
+				return Vector2D(A.x, P.y);
+			float d1, d2;
+			d1 = Vector2D::Distance(P, A);
+			d2 = Vector2D::Distance(P, B);
+			if (d1 < d2) return A;
+			return B;
+		}
 		float m = (B.y - A.y) / (B.x - A.x); // Slope
 		float b = A.y - m * A.x; // Y - interscept 
 		Vector2D D = (Vector2D((2 * (m * (P.y - b) + P.x)) / (m * m + 1) - P.x, 2 * (m * (m * (P.y - b) + P.x)) / (m * m + 1) + 2 * b - P.y) + P) / 2; // Point reflected along the Line
@@ -414,6 +425,28 @@ namespace ZCPP
 			return Vector2D(LinearInterpolate(A.x, B.x, t), LinearInterpolate(A.y, B.y, t));
 		}
 		return NAN;
+	}
+
+	// Returns the cloesest point to the rectangle r with size s
+	Vector2D PointToRect(Vector2D P, Vector2D r, Vector2D s)
+	{
+		if (P > r - s && P < r + s)
+		{
+			bool left = P.x < r.x;
+			bool top = P.y < r.y;
+			if (abs(P.x - r.x) - s.x > abs(P.y - r.y) - s.y)
+			{
+				P.x += (-1 * left) * s.x + (1 * !left) * s.x;
+			}
+			else
+			{
+				P.y += (-1 * top) * s.y + (1 * !top) * s.y;
+			}
+		}
+
+		float x = Clamp(r.x - s.x, r.x + s.x, P.x);
+		float y = Clamp(r.y - s.y, r.y + s.y, P.y);
+		return Vector2D(x, y);
 	}
 
 
