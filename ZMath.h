@@ -19,12 +19,16 @@
 namespace ZCPP
 {
 	std::random_device device; std::mt19937 rng(device());
-	std::uniform_int_distribution<int32_t> rnd(-2147483647, 2147483647);
+	std::uniform_int_distribution<int32_t> rnd(-2147483648, 2147483647);
 
 	// The constant 𝜋
-	const float Pi = 3.1415926535897932;
+	const double Pi = 3.1415926535897932;
 	// The constant e
-	const float e = 2.7182818284590452;
+	const double e = 2.7182818284590452;
+	// The constant ϕ
+	const double phi = 1.618033988749895;
+	// The constant c (speed of light in a vacuum)
+	const double c = 299792458;
 
 	// Converting Degress to Radians
 	const float DegtoRad = Pi * 2.0f / 360.0f;
@@ -46,8 +50,8 @@ namespace ZCPP
 
 	// Returns the absolute Value of Value
 	template <typename Type> Type Abs(Type Value) { if (Value < 0) return -Value; return Value; }
-	// Returns the signed Value of Value
-	template <typename Type> Type Sign(Type Value) { if (Value < 0) return Value; return -Value; }
+	// Returns -1 if Value is negative and 1 otherwise
+	template <typename Type> int Sign(Type Value) { if (Value < 0) return -1; return 1; }
 
 	// Copies the sign value of Sign and applies it to Value
 	template <typename Type> void CopySign(Type& Value, Type Sign) { bool Negative = Sign < 0; if (Value < 0 == Negative) return; Value = -Value; }
@@ -57,8 +61,8 @@ namespace ZCPP
 	// returns double between -1 & 1
 	double GetDecimal(double Value) { return Value - int(Value); }
 
-	/* Int32 Random ( -2147483647, 2147483647 ) */
-	// Returns a random number between -2147483647, 2147483647 in int form
+	/* Int32 Random ( -2147483648, 2147483647 ) */
+	// Returns a random number between -2147483648, 2147483647 in int form
 	int32_t Random() { return rnd(rng); }
 	// Returns a random number between the min and max in int form
 	int32_t Random(int32_t min, int32_t max) {
@@ -67,7 +71,6 @@ namespace ZCPP
 	}
 
 	/* float Random ( -1, 1 ) */
-	// 25 decimal point precision
 	// Returns a random number between -1 and 1 in float form
 	float Randomf() { std::uniform_real_distribution<float> nrnd(-1, 1); return nrnd(rng); }
 	// Returns a random number between the min and max in float form
@@ -76,14 +79,22 @@ namespace ZCPP
 		std::uniform_real_distribution<float> nrnd(min, max); return nrnd(rng);
 	}
 
-	/* float Random ( -1, 1 ) */
-	// 50 decimal point precision
-	// Returns a random number between -1 and 1 in float form
+	/* double Random ( -1, 1 ) */
+	// Returns a random number between -1 and 1 in double form
 	double Randomd() { std::uniform_real_distribution<double> nrnd(-1, 1); return nrnd(rng); }
-	// Returns a random number between the min and max in float form
+	// Returns a random number between the min and max in double form
 	double Randomd(double min, double max) {
 		if (max < min) Swap(min, max); if (min == max) return max;
 		std::uniform_real_distribution<double> nrnd(min, max); return nrnd(rng);
+	}
+
+	/* long double Random ( -1, 1 ) */
+	// Returns a random number between -1 and 1 in long double form
+	long double Randomhl() { std::uniform_real_distribution<double> nrnd(-1, 1); return nrnd(rng); }
+	// Returns a random number between the min and max in long double form
+	long double Randomhl(long double min, long double max) {
+		if (max < min) Swap(min, max); if (min == max) return max;
+		std::uniform_real_distribution<long double> nrnd(min, max); return nrnd(rng);
 	}
 
 	// Returns bool if Value is a Whole number
@@ -138,9 +149,7 @@ namespace ZCPP
 	float PingPong(float Value, float length = 1) { Value = Clamp(0.0f, length * 2, Value - Floor(Value / (length * 2)) * (length * 2)); return length - Abs(Value - length); }
 
 	// Smoothly interpolates from Val_A to Val_B with Value
-	float SmoothStep(float Val_A, float Val_B, float Value) { //t = Clamp(0.f, 1.f, Value);
-		Value = -2.f * Value * Value * Value + 3.f * Value * Value; return Val_B * Value + Val_A * (1.f - Value);
-	}
+	float SmoothStep(float Val_A, float Val_B, float Value) { Value = -2.f * Value * Value * Value + 3.f * Value * Value; return Val_B * Value + Val_A * (1.f - Value); }
 
 	// Maps values from in-min and in-max to out-min and out-max
 	template <typename Type> Type Map(Type inMin, Type inMax, Type outMin, Type outMax, Type Value) { /*if (inMax < inMin) Swap(inMin, inMax); if (outMax < outMin) Swap(outMin, outMax);*/ return (Type)LinearInterpolate(outMin, outMax, InvLinearInterpolate(inMin, inMax, Value)); }
@@ -182,7 +191,7 @@ namespace ZCPP
 	}
 
 	// Reverses an array
-	template <typename Type> void Reverse(Type* Array, uint32_t size) { for (int32_t index = 0, revindex = size - 1; index < size / 2; index++, revindex--) { Swap(Array[index], Array[revindex]); } }
+	template <typename Type> void Reverse(Type* Array, uint32_t size) { for (int32_t index = 0, revindex = size - 1; index < size * .5; index++, revindex--) { Swap(Array[index], Array[revindex]); } }
 
 	// Randomizes an array
 	template <typename Type> void Randomize(Type* Array, uint32_t size) { for (int32_t index = 0; index < size; index++) Swap(Array[index], Array[Random(0, size - 1)]); }
@@ -206,8 +215,98 @@ namespace ZCPP
 		void Log(float i) { Log(ToString(i)); }
 		void Log(double i) { Log(ToString(i)); }
 		void Log(long double i) { Log(ToString(i)); }
+
+		void Log(std::string s, bool b) { if (b) { Log(s + " True"); return; } Log(s + " False"); }
+		void Log(std::string s, int i) { Log(s + " " + ToString(i)); }
+		void Log(std::string s, long i) { Log(s + " " + ToString(i)); }
+		void Log(std::string s, long long i) { Log(s + " " + ToString(i)); }
+		void Log(std::string s, unsigned i) { Log(s + " " + ToString(i)); }
+		void Log(std::string s, unsigned long i) { Log(s + " " + ToString(i)); }
+		void Log(std::string s, unsigned long long i) { Log(s + " " + ToString(i)); }
+		void Log(std::string s, float i) { Log(s + " " + ToString(i)); }
+		void Log(std::string s, double i) { Log(s + " " + ToString(i)); }
+		void Log(std::string s, long double i) { Log(s + " " + ToString(i)); }
+
+		void Log(bool b, std::string s) { if (b) { Log("True " + s); return; } Log("False " + s); }
+		void Log(int i, std::string s) { Log(ToString(i) + " " + s); }
+		void Log(long i, std::string s) { Log(ToString(i) + " " + s); }
+		void Log(long long i, std::string s) { Log(ToString(i) + " " + s); }
+		void Log(unsigned i, std::string s) { Log(ToString(i) + " " + s); }
+		void Log(unsigned long i, std::string s) { Log(ToString(i) + " " + s); }
+		void Log(unsigned long long i, std::string s) { Log(ToString(i) + " " + s); }
+		void Log(float i, std::string s) { Log(ToString(i) + " " + s); }
+		void Log(double i, std::string s) { Log(ToString(i) + " " + s); }
+		void Log(long double i, std::string s) { Log(ToString(i) + " " + s); }
+
 	}
+
 	// Vector classes:
+
+	class Vector2I
+	{
+	public:
+		int x, y;
+
+		Vector2I() : x(0), y(0) {}
+		Vector2I(int _) : x(_), y(_) {}
+		Vector2I(int _x, int _y) : x(_x), y(_y) {}
+
+		void operator = (const Vector2I& v) { x = v.x; y = v.y; }
+
+		static float Length(Vector2I A) { return Sqrt(Sqr(A.x) + Sqr(A.y)); }
+		float Length() { return Length(*this); }
+		static float Distance(Vector2I A, Vector2I B) { return Sqrt(Sqr(B.x - A.x) + Sqr(B.y - A.y)); }
+		static Vector2I Abs(Vector2I A) { return Vector2I(ZCPP::Abs(A.x), ZCPP::Abs(A.y)); }
+		Vector2I Abs() { return Abs(*this); }
+
+		static std::string ToString(Vector2I A) { return ZCPP::ToString(A.x) + ", " + ZCPP::ToString(A.y); }
+		std::string ToString() { return ToString(*this); }
+
+
+		/* Vector2I Overloaded Operators */
+
+		Vector2I  operator +  (const Vector2I& rhs) const { return Vector2I(this->x + rhs.x, this->y + rhs.y); }
+		Vector2I  operator -  (const Vector2I& rhs) const { return Vector2I(this->x - rhs.x, this->y - rhs.y); }
+		Vector2I  operator +  (const int& rhs) const { return Vector2I(this->x + rhs, this->y + rhs); }
+		Vector2I  operator -  (const int& rhs) const { return Vector2I(this->x - rhs, this->y - rhs); }
+		Vector2I  operator *  (const int& rhs)           const { return Vector2I(this->x * rhs, this->y * rhs); }
+		Vector2I  operator *  (const Vector2I& rhs) const { return Vector2I(this->x * rhs.x, this->y * rhs.y); }
+		Vector2I  operator /  (const int& rhs)           const { return Vector2I(this->x / rhs, this->y / rhs); }
+		Vector2I  operator /  (const Vector2I& rhs) const { return Vector2I(this->x / rhs.x, this->y / rhs.y); }
+
+		Vector2I& operator += (const Vector2I& rhs) { this->x += rhs.x; this->y += rhs.y; return *this; }
+		Vector2I& operator -= (const Vector2I& rhs) { this->x -= rhs.x; this->y -= rhs.y; return *this; }
+		Vector2I& operator += (const int& rhs) { this->x += rhs; this->y += rhs; return *this; }
+		Vector2I& operator -= (const int& rhs) { this->x -= rhs; this->y -= rhs; return *this; }
+		Vector2I& operator *= (const Vector2I& rhs) { this->x *= rhs.x; this->y *= rhs.y; return *this; }
+		Vector2I& operator /= (const Vector2I& rhs) { this->x /= rhs.x; this->y /= rhs.y; return *this; }
+		Vector2I& operator *= (const int& rhs) { this->x *= rhs; this->y *= rhs; return *this; }
+		Vector2I& operator /= (const int& rhs) { this->x /= rhs; this->y /= rhs; return *this; }
+	};
+
+	Vector2I operator + (const int& lhs, const Vector2I& rhs) { return Vector2I(lhs + rhs.x, lhs + rhs.y); }
+	Vector2I operator - (const int& lhs, const Vector2I& rhs) { return Vector2I(lhs - rhs.x, lhs - rhs.y); }
+	Vector2I operator * (const int& lhs, const Vector2I& rhs) { return Vector2I(lhs * rhs.x, lhs * rhs.y); }
+	Vector2I operator / (const int& lhs, const Vector2I& rhs) { return Vector2I(lhs / rhs.x, lhs / rhs.y); }
+
+	/* Comparison Operators */
+
+	bool operator == (const Vector2I& A, const Vector2I& B) { return (A.x == B.x && A.y == B.y); }
+	bool operator <  (const Vector2I& A, const Vector2I& B) { return (A.x < B.x&& A.y < B.y); }
+	bool operator >  (const Vector2I& A, const Vector2I& B) { return (A.x > B.x && A.y > B.y); }
+	bool operator <= (const Vector2I& A, const Vector2I& B) { return (A.x <= B.x && A.y <= B.y); }
+	bool operator >= (const Vector2I& A, const Vector2I& B) { return (A.x >= B.x && A.y >= B.y); }
+	bool operator != (const Vector2I& A, const Vector2I& B) { return (A.x != B.x && A.y != B.y); }
+
+	// Comparing A Vector2I to a int is like comparing a Vector2I to a Vector2I with all the same values
+
+	bool operator == (const Vector2I& A, const int& B) { return (A.x == B && A.y == B); }
+	bool operator <  (const Vector2I& A, const int& B) { return (A.x < B&& A.y < B); }
+	bool operator >  (const Vector2I& A, const int& B) { return (A.x > B && A.y > B); }
+	bool operator <= (const Vector2I& A, const int& B) { return (A.x <= B && A.y <= B); }
+	bool operator >= (const Vector2I& A, const int& B) { return (A.x >= B && A.y >= B); }
+	bool operator != (const Vector2I& A, const int& B) { return (A.x != B && A.y != B); }
+
 
 	class Vector2D // Vector2D class ( X, Y )
 	{
@@ -228,9 +327,31 @@ namespace ZCPP
 		static Vector2D Abs(Vector2D A) { return Vector2D(ZCPP::Abs(A.x), ZCPP::Abs(A.y)); }
 		Vector2D Abs() { return Abs(*this); }
 		Vector2D UnitVector() { return Normalize(*this); }
-		static Vector2D Rotate(Vector2D A, float r) { Vector2D V; V.x = A.x * Cos(r) - A.y * Sin(r); V.y = Sin(r) * A.x + Cos(r) * A.y; return V; }
+		static Vector2D Rotate(Vector2D A, float r) { float cr = Cos(r); float sr = Sin(r); Vector2D V; V.x = A.x * cr - A.y * sr; V.y = sr * A.x + cr * A.y; return V; }
 		Vector2D Rotate(float r) { return Rotate(*this, r); }
 		static Vector2D Random() { float r = Randomf(0, 360) * DegtoRad; return(Vector2D(Cos(r), Sin(r))); }
+
+		static float DotProduct(Vector2D A, Vector2D B) { return A.x * B.x + A.y * B.y; }
+		float DotProduct(Vector2D v) { return DotProduct(*this, v); }
+
+		// vector must be normalized
+		// Reflects a vector off of a normal
+		static Vector2D Reflect(Vector2D vector, Vector2D normal) { return vector - normal * 2 * vector.DotProduct(normal); }
+
+		// Reflects the vector off of normal
+		Vector2D Reflect(Vector2D normal) { return Reflect(*this, normal); }
+
+		// Creates a normalized direction vector of length
+		static Vector2D Direction(float r, float length = 1) { return Vector2D(Cos(r), Sin(r)) * length; }
+
+		static Vector2D Floor(Vector2D A) { return Vector2D(ZCPP::Floor(A.x), ZCPP::Floor(A.y)); }
+		Vector2D Floor() { return Floor(*this); }
+
+		static Vector2D Ceil(Vector2D A) { return Vector2D(ZCPP::Ceil(A.x), ZCPP::Ceil(A.y)); }
+		Vector2D Ceil() { return Floor(*this); }
+
+		static Vector2D Round(Vector2D A) { return Vector2D(ZCPP::Round(A.x), ZCPP::Round(A.y)); }
+		Vector2D Round() { return Floor(*this); }
 
 		// Converts A Vector2D into a std::string
 		static std::string ToString(Vector2D A, const unsigned Precision = 6) { return "<" + ZCPP::ToString(A.x, Precision) + ", " + ZCPP::ToString(A.y, Precision) + ">"; }
@@ -277,7 +398,7 @@ namespace ZCPP
 	bool operator >= (const Vector2D& A, const Vector2D& B) { return (A.x >= B.x && A.y >= B.y); }
 	bool operator != (const Vector2D& A, const Vector2D& B) { return (A.x != B.x && A.y != B.y); }
 
-	// Comparing A Vector3D to a float is like comparing a Vector3D to a Vector3D with all the same values
+	// Comparing A Vector2D to a float is like comparing a Vector2D to a Vector2D with all the same values
 
 	bool operator == (const Vector2D& A, const float& B) { return (A.x == B && A.y == B); }
 	bool operator <  (const Vector2D& A, const float& B) { return (A.x < B&& A.y < B); }
@@ -324,12 +445,14 @@ namespace ZCPP
 		float a = (Sqr(r1) - Sqr(r2) + Sqr(d)) / (2 * d);
 		float h = Sqrt(Sqr(r1) - Sqr(a));
 
-		Vector2D c = A + a * (B - A) / d;
+		float id = 1 / d;
 
-		C.x = c.x + h * (B.y - A.y) / d;
-		C.y = c.y - h * (B.x - A.x) / d;
-		D.x = c.x - h * (B.y - A.y) / d;
-		D.y = c.y + h * (B.x - A.x) / d;
+		Vector2D c = A + a * (B - A) * id;
+
+		C.x = c.x + h * (B.y - A.y) * id;
+		C.y = c.y - h * (B.x - A.x) * id;
+		D.x = c.x - h * (B.y - A.y) * id;
+		D.y = c.y + h * (B.x - A.x) * id;
 	}
 
 	// Find two points that Line L1-L2 passes through Circle C, with radius r, returns A, B
@@ -343,14 +466,16 @@ namespace ZCPP
 		L1 -= C;
 		L2 -= C;
 
-		Vector2D d = Vector2D(L2.x-L1.x, L2.y-L1.y);
+		Vector2D d = Vector2D(L2.x - L1.x, L2.y - L1.y);
 		float dr = Sqrt(Sqr(d.x) + Sqr(d.y));//Vector2D::Length(d);
 		float D = L1.x * L2.y - L2.x * L1.y;
 
-		A.x = (D * d.y + sgn(d.y) * d.x * Sqrt(Sqr(r) * Sqr(dr) - Sqr(D))) / Sqr(dr) + C.x;
-		B.x = (D * d.y - sgn(d.y) * d.x * Sqrt(Sqr(r) * Sqr(dr) - Sqr(D))) / Sqr(dr) + C.x;
-		A.y = (-D * d.x + Abs(d.y) * Sqrt(Sqr(r) * Sqr(dr) - Sqr(D))) / Sqr(dr) + C.y;
-		B.y = (-D * d.x - Abs(d.y) * Sqrt(Sqr(r) * Sqr(dr) - Sqr(D))) / Sqr(dr) + C.y;
+		float isdr = 1 / Sqr(dr);
+
+		A.x = (D * d.y + sgn(d.y) * d.x * Sqrt(Sqr(r) * Sqr(dr) - Sqr(D))) * isdr + C.x;
+		B.x = (D * d.y - sgn(d.y) * d.x * Sqrt(Sqr(r) * Sqr(dr) - Sqr(D))) * isdr + C.x;
+		A.y = (-D * d.x + Abs(d.y) * Sqrt(Sqr(r) * Sqr(dr) - Sqr(D))) * isdr + C.y;
+		B.y = (-D * d.x - Abs(d.y) * Sqrt(Sqr(r) * Sqr(dr) - Sqr(D))) * isdr + C.y;
 	}
 
 	// Find two points that Line Segment L1-L2 passes through Circle C, with radius r, returns A, B
@@ -364,17 +489,19 @@ namespace ZCPP
 		float dr = Sqrt(Sqr(d.x) + Sqr(d.y));//Vector2D::Length(d);
 		float D = L1.x * L2.y - L2.x * L1.y;
 
-		A.x = (D * d.y + sgn(d.y) * d.x * Sqrt(Sqr(r) * Sqr(dr) - Sqr(D))) / Sqr(dr) + C.x;
-		float t = InvLinearInterpolate(L1.x, L2.x, A.x-C.x);
+		float isdr = 1 / Sqr(dr);
+
+		A.x = (D * d.y + sgn(d.y) * d.x * Sqrt(Sqr(r) * Sqr(dr) - Sqr(D))) * isdr + C.x;
+		float t = InvLinearInterpolate(L1.x, L2.x, A.x - C.x);
 		if (t >= 0 && t <= 1)
-			A.y = (-D * d.x + Abs(d.y) * Sqrt(Sqr(r) * Sqr(dr) - Sqr(D))) / Sqr(dr) + C.y;
+			A.y = (-D * d.x + Abs(d.y) * Sqrt(Sqr(r) * Sqr(dr) - Sqr(D))) * isdr + C.y;
 		else
 			A = NAN;
 
-		B.x = (D * d.y - sgn(d.y) * d.x * Sqrt(Sqr(r) * Sqr(dr) - Sqr(D))) / Sqr(dr) + C.x;
-		t = InvLinearInterpolate(L1.x, L2.x, B.x-C.x);
+		B.x = (D * d.y - sgn(d.y) * d.x * Sqrt(Sqr(r) * Sqr(dr) - Sqr(D))) * isdr + C.x;
+		t = InvLinearInterpolate(L1.x, L2.x, B.x - C.x);
 		if (t >= 0 && t <= 1)
-			B.y = (-D * d.x - Abs(d.y) * Sqrt(Sqr(r) * Sqr(dr) - Sqr(D))) / Sqr(dr) + C.y;
+			B.y = (-D * d.x - Abs(d.y) * Sqrt(Sqr(r) * Sqr(dr) - Sqr(D))) * isdr + C.y;
 		else
 			B = NAN;
 	}
@@ -385,7 +512,7 @@ namespace ZCPP
 		if (B.x - A.x == 0)
 		{
 			float t = InvLinearInterpolate(A.y, B.y, P.y);
-			if(t >= 0 && t <=  1)
+			if (t >= 0 && t <= 1)
 				return Vector2D(A.x, P.y);
 			float d1, d2;
 			d1 = Vector2D::Distance(P, A);
@@ -395,7 +522,7 @@ namespace ZCPP
 		}
 		float m = (B.y - A.y) / (B.x - A.x); // Slope
 		float b = A.y - m * A.x; // Y - interscept 
-		Vector2D D = (Vector2D((2 * (m * (P.y - b) + P.x)) / (m * m + 1) - P.x, 2 * (m * (m * (P.y - b) + P.x)) / (m * m + 1) + 2 * b - P.y) + P) / 2; // Point reflected along the Line
+		Vector2D D = (Vector2D((2 * (m * (P.y - b) + P.x)) / (m * m + 1) - P.x, 2 * (m * (m * (P.y - b) + P.x)) / (m * m + 1) + 2 * b - P.y) + P) * .5; // Point reflected along the Line
 		float t = InvLinearInterpolate(A.x, B.x, D.x); // Where the closest point is on the line
 		t = Clamp(0.f, 1.f, t); // Clamp the point on the line between both points to make it a line segment
 		return Vector2D(LinearInterpolate(A.x, B.x, t), LinearInterpolate(A.y, B.y, t));
@@ -406,7 +533,7 @@ namespace ZCPP
 		// Line AB // Point P
 		float m = (B.y - A.y) / (B.x - A.x); // Slope
 		float b = A.y - m * A.x; // Y - interscept 
-		return (Vector2D((2 * (m * (P.y - b) + P.x)) / (m * m + 1) - P.x, 2 * (m * (m * (P.y - b) + P.x)) / (m * m + 1) + 2 * b - P.y) + P) / 2;
+		return (Vector2D((2 * (m * (P.y - b) + P.x)) / (m * m + 1) - P.x, 2 * (m * (m * (P.y - b) + P.x)) / (m * m + 1) + 2 * b - P.y) + P) * .5;
 	}
 
 	// Find the point of intersection between Line AB and Line CD (infinite)
@@ -434,7 +561,7 @@ namespace ZCPP
 		{
 			bool left = P.x < r.x;
 			bool top = P.y < r.y;
-			if (abs(P.x - r.x) - s.x > abs(P.y - r.y) - s.y)
+			if (Abs(P.x - r.x) - s.x > Abs(P.y - r.y) - s.y)
 			{
 				P.x += (-1 * left) * s.x + (1 * !left) * s.x;
 			}
@@ -449,6 +576,8 @@ namespace ZCPP
 		return Vector2D(x, y);
 	}
 
+	Vector2I V2D_FtoI(Vector2D A) { return Vector2I(A.x, A.y); }
+	Vector2D V2D_ItoF(Vector2I A) { return Vector2D(A.x, A.y); }
 
 
 
@@ -669,7 +798,7 @@ namespace ZCPP
 
 		float p = 2 * (A.w * A.y - A.z * A.x);
 		if (Abs(p) >= 1)
-			Euler.y = std::copysign(Pi / 2, p);
+			Euler.y = std::copysign(Pi * .5, p);
 		else
 			Euler.y = asinf(p);
 
@@ -681,12 +810,12 @@ namespace ZCPP
 	Quaternion EulerToQuaternion(Vector3D A)
 	{
 		Quaternion quat;
-		float cy = Cos(A.z / 2);
-		float sy = Sin(A.z / 2);
-		float cp = Cos(A.y / 2);
-		float sp = Sin(A.y / 2);
-		float cr = Cos(A.x / 2);
-		float sr = Sin(A.x / 2);
+		float cy = Cos(A.z * .5);
+		float sy = Sin(A.z * .5);
+		float cp = Cos(A.y * .5);
+		float sp = Sin(A.y * .5);
+		float cr = Cos(A.x * .5);
+		float sr = Sin(A.x * .5);
 
 		quat.w = cr * cp * cy + sr * sp * sy;
 		quat.x = sr * cp * cy - cr * sp * sy;
@@ -722,7 +851,7 @@ namespace ZCPP
 
 	Quaternion RotateVector(Vector3D Vector, Vector3D Axis, float r)
 	{
-		Quaternion q = Quaternion(Axis.UnitVector() * Sin(r / 2), Cos(r / 2));
+		Quaternion q = Quaternion(Axis.UnitVector() * Sin(r * .5), Cos(r * .5));
 		Quaternion VectorP = Multiply(Multiply(q, Quaternion(Vector, 0)), Conjugate(q));
 
 		return VectorP;
@@ -844,11 +973,13 @@ namespace ZCPP
 		// Rotate a Vector2D by r
 		static Vector2D Rotate(float r, Vector2D V)
 		{
+			float c = Cos(r);
+			float s = Sin(r);
 			Matrix3 M = Matrix3::Identity();
-			M.M[0][0] = Cos(r);
-			M.M[0][1] = -Sin(r);
-			M.M[1][0] = Sin(r);
-			M.M[1][1] = Cos(r);
+			M.M[0][0] = c;
+			M.M[0][1] = -s;
+			M.M[1][0] = s;
+			M.M[1][1] = c;
 			return Multiply(M, V).To2D();
 		}
 	};
@@ -1073,11 +1204,14 @@ namespace ZCPP
 		static Matrix4 Camera_PerspectiveProjection(float Znear, float Zfar, float rFOV, float AP)
 		{
 			Matrix4 m;
-			m.M[0][0] = 1 / (AP * Tan(rFOV / 2));
-			m.M[1][1] = -1 / (Tan(rFOV / 2));
-			m.M[2][2] = ((Zfar - Znear) / (Zfar - Znear));
+			float tfh = Tan(rFOV * .5);
+			float izfzn = 1 / (Zfar - Znear);
+
+			m.M[0][0] = 1 / (AP * tfh);
+			m.M[1][1] = -1 / (tfh);
+			m.M[2][2] = (Zfar - Znear) * izfzn;
 			m.M[3][2] = 1;
-			m.M[2][3] = ((2 * Zfar * Znear) / (Zfar - Znear));
+			m.M[2][3] = (2 * Zfar * Znear) * izfzn;
 			return m;
 		}
 
